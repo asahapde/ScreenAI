@@ -1,0 +1,63 @@
+{
+  "name": "screenai",
+  "version": "1.0.0",
+  "description": "AI-powered candidate screening platform",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asahapde/ScreenAI.git"
+  },
+  "keywords": [
+    "ai",
+    "screening",
+    "recruitment",
+    "nextjs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asahapde/ScreenAI/issues"
+  },
+  "homepage": "https://github.com/asahapde/ScreenAI#readme",
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "@types/formidable": "^3.4.5",
+    "@types/node": "^24.0.3",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@types/uuid": "^10.0.0",
+    "autoprefixer": "^10.4.21",
+    "cheerio": "^1.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "eslint": "^9.29.0",
+    "eslint-config-next": "^15.3.4",
+    "formidable": "^3.5.4",
+    "groq-sdk": "^0.25.0",
+    "lucide-react": "^0.519.0",
+    "next": "^15.3.4",
+    "pdf-parse": "^1.1.1",
+    "postcss": "^8.5.6",
+    "puppeteer": "^24.10.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.8.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/pdf-parse": "^1.1.5"
+  }
+}
