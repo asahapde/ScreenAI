@@ -277,4 +277,45 @@ export interface FileUpload {
   progress: number
   status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error'
   error?: string
+}
+
+export interface Job {
+  id: string
+  title: string
+  description: string
+  company: string
+  location?: string
+  salary?: string
+  requirements: string[]
+  benefits?: string[]
+  createdAt: Date
+  status: 'active' | 'paused' | 'closed'
+  applicantCount: number
+}
+
+export interface Resume {
+  id: string
+  candidateName: string
+  email: string
+  phone?: string
+  uploadedAt: Date
+  fileName: string
+  parsedData: ParsedResume
+  status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected'
+  jobId?: string
+  aiScore?: number
+  notes?: string
+}
+
+export interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: Date
+}
+
+export interface JobCreationChat {
+  messages: ChatMessage[]
+  isLoading: boolean
+  currentJob?: Partial<Job>
 } 

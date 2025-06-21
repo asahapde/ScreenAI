@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -79,7 +79,7 @@ const mockAnalysisResult: AnalysisResult = {
   createdAt: new Date()
 }
 
-export default function ResultsPage() {
+function ResultsContent() {
   const searchParams = useSearchParams()
   const candidateId = searchParams.get("id")
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
@@ -101,9 +101,9 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <Brain className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+          <Brain className="h-12 w-12 text-indigo-600 mx-auto mb-4 animate-pulse" />
           <p className="text-lg text-gray-600">Loading analysis results...</p>
         </div>
       </div>
@@ -112,14 +112,14 @@ export default function ResultsPage() {
 
   if (!analysisResult) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <Card className="max-w-md w-full bg-white/60 backdrop-blur-sm border-white/20">
           <CardHeader className="text-center">
             <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <CardTitle className="text-red-600">Results Not Found</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <Button asChild>
+            <Button asChild className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
               <Link href="/upload">Start New Analysis</Link>
             </Button>
           </CardContent>
@@ -129,25 +129,34 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Navigation */}
-      <nav className="bg-white border-b">
+      <nav className="bg-white/80 backdrop-blur-lg border-b border-white/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <ArrowLeft className="h-5 w-5" />
-              <span>Back to Home</span>
-            </Link>
-            <div className="flex items-center space-x-2">
-              <Brain className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">ScreenAI</span>
+            <div className="flex items-center space-x-6">
+              <Link href="/" className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition-colors">
+                <ArrowLeft className="h-5 w-5" />
+                <span>Back to Home</span>
+              </Link>
+              <Link href="/dashboard" className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition-colors">
+                <FileText className="h-4 w-4" />
+                <span>Dashboard</span>
+              </Link>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
+              <div className="relative">
+                <Brain className="h-8 w-8 text-indigo-600" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">ScreenAI</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" className="bg-white/60 backdrop-blur-sm border-white/20 hover:bg-white/80">
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="bg-white/60 backdrop-blur-sm border-white/20 hover:bg-white/80">
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
@@ -168,7 +177,7 @@ export default function ResultsPage() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
+            <Card className="bg-white/60 backdrop-blur-sm border-white/20 hover:bg-white/80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
               <CardContent className="p-6 text-center">
                 <div className={`text-3xl font-bold mb-2 ${getScoreColor(analysisResult.fitScore)}`}>
                   {analysisResult.fitScore}%
@@ -313,4 +322,19 @@ export default function ResultsPage() {
       </div>
     </div>
   )
-} 
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Brain className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-lg text-gray-600">Loading analysis results...</p>
+        </div>
+      </div>
+    }>
+      <ResultsContent />
+    </Suspense>
+  )
+}

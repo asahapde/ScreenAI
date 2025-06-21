@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,7 +40,7 @@ const PROCESSING_STEPS = [
   }
 ]
 
-export default function ProcessingPage() {
+function ProcessingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const candidateId = searchParams.get("id")
@@ -125,8 +125,8 @@ export default function ProcessingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <Card className="max-w-md w-full bg-white/60 backdrop-blur-sm border-white/20">
           <CardHeader className="text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <CardTitle className="text-red-600">Processing Error</CardTitle>
@@ -134,7 +134,7 @@ export default function ProcessingPage() {
           </CardHeader>
           <CardContent className="text-center">
             <div className="space-y-4">
-              <Button asChild>
+              <Button asChild className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
                 <Link href="/upload">Try Again</Link>
               </Button>
               <Button variant="outline" asChild>
@@ -148,18 +148,27 @@ export default function ProcessingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Navigation */}
-      <nav className="bg-white border-b">
+      <nav className="bg-white/80 backdrop-blur-lg border-b border-white/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <ArrowLeft className="h-5 w-5" />
-              <span>Back to Home</span>
-            </Link>
+            <div className="flex items-center space-x-6">
+              <Link href="/" className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition-colors">
+                <ArrowLeft className="h-5 w-5" />
+                <span>Back to Home</span>
+              </Link>
+              <Link href="/dashboard" className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition-colors">
+                <BarChart3 className="h-4 w-4" />
+                <span>Dashboard</span>
+              </Link>
+            </div>
             <div className="flex items-center space-x-2">
-              <Brain className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">ScreenAI</span>
+              <div className="relative">
+                <Brain className="h-8 w-8 text-indigo-600" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">ScreenAI</span>
             </div>
           </div>
         </div>
@@ -180,7 +189,7 @@ export default function ProcessingPage() {
           </div>
 
           {/* Overall Progress */}
-          <Card className="mb-8">
+          <Card className="mb-8 bg-white/60 backdrop-blur-sm border-white/20 hover:bg-white/80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <CardHeader>
               <CardTitle>Overall Progress</CardTitle>
               <CardDescription>
@@ -300,4 +309,21 @@ export default function ProcessingPage() {
       </div>
     </div>
   )
-} 
+}
+
+export default function ProcessingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6 text-center">
+            <div className="loading-spinner mx-auto mb-4" />
+            <p>Loading...</p>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <ProcessingContent />
+    </Suspense>
+  )
+}

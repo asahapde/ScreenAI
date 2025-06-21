@@ -4,6 +4,26 @@
 
 ScreenAI is a comprehensive AI-powered candidate screening platform that verifies candidate claims across their resume, GitHub, LinkedIn, and more. It provides recruiters with intelligent insights, fit scoring, and red flag detection to make better hiring decisions.
 
+## ✨ What's New
+
+### 🎯 AI-Powered Job Creation
+- **Conversational Interface** - Create job postings through natural language chat
+- **Smart Suggestions** - AI recommends requirements, benefits, and salary ranges
+- **Comprehensive Output** - Generates complete, professional job descriptions
+- **Real-time Processing** - Instant responses powered by Groq's Llama models
+
+### 🚀 Beautiful Dashboard
+- **Job Management** - Create, manage, and track all job postings in one place
+- **Resume Gallery** - View and manage uploaded candidate resumes with status tracking
+- **Advanced Filtering** - Search and filter jobs and candidates by status, skills, and more
+- **Modern UI** - Phenomenal, elegant design with smooth animations and glass morphism effects
+
+### 🎨 Redesigned Experience
+- **Landing Page** - Stunning new homepage with gradient backgrounds and animations
+- **Professional Design** - Clean, minimalistic interface with attention to detail
+- **Responsive Layout** - Perfect experience on desktop, tablet, and mobile devices
+- **Enhanced UX** - Intuitive navigation and workflow optimization
+
 ## 🚀 Features
 
 ### Core Features
