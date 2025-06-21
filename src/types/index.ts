@@ -305,6 +305,7 @@ export interface Resume {
   jobId?: string
   aiScore?: number
   notes?: string
+  jobRecommendations?: Array<{jobId: string, score: number}>
 }
 
 export interface ChatMessage {
