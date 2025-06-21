@@ -1,6 +1,18 @@
 import { ParsedResume, WorkExperience, Education } from '@/types'
+import Groq from 'groq-sdk'
 
 export class ResumeParser {
+  private groq: Groq | null = null
+
+  constructor() {
+    // Initialize Groq if API key is available
+    if (process.env.GROQ_API_KEY) {
+      this.groq = new Groq({
+        apiKey: process.env.GROQ_API_KEY
+      })
+    }
+  }
+
   async parseFile(buffer: Buffer, filename: string): Promise<ParsedResume> {
     let text: string
     
@@ -13,7 +25,32 @@ export class ResumeParser {
       text = buffer.toString('utf-8')
     }
     
-    return this.parseResumeText(text)
+    // If traditional parsing failed and we have AI available, try AI-enhanced parsing
+    if ((!text || text.trim().length === 0) && this.groq) {
+      console.log('Traditional parsing failed, attempting AI-enhanced extraction...')
+      text = await this.extractTextWithAI(buffer, filename)
+    }
+    
+    const parsedResume = this.parseResumeText(text)
+    
+    // If social links are missing, use AI to extract them
+    if (this.groq && (!parsedResume.socialLinks?.linkedin && !parsedResume.socialLinks?.github && !parsedResume.socialLinks?.portfolio)) {
+      console.log('Using AI to enhance social link extraction...')
+      const enhancedSocialLinks = await this.extractSocialLinksWithAI(text, parsedResume)
+      
+      // Only use AI links if they pass validation and we don't already have better ones
+      if (enhancedSocialLinks.linkedin && !parsedResume.socialLinks?.linkedin) {
+        parsedResume.socialLinks = { ...parsedResume.socialLinks, linkedin: enhancedSocialLinks.linkedin }
+      }
+      if (enhancedSocialLinks.github && !parsedResume.socialLinks?.github) {
+        parsedResume.socialLinks = { ...parsedResume.socialLinks, github: enhancedSocialLinks.github }
+      }
+      if (enhancedSocialLinks.portfolio && !parsedResume.socialLinks?.portfolio) {
+        parsedResume.socialLinks = { ...parsedResume.socialLinks, portfolio: enhancedSocialLinks.portfolio }
+      }
+    }
+    
+    return parsedResume
   }
 
   private async extractTextFromPDF(buffer: Buffer, filename: string): Promise<string> {
@@ -29,14 +66,90 @@ export class ResumeParser {
         return content
       }
       
-      // For binary PDFs, we cannot easily extract text in a server environment
-      // without complex dependencies. Return empty string so the user knows
-      // they need to provide a text-based resume or convert their PDF
-      console.log('Binary PDF detected - cannot extract text without additional PDF processing libraries')
+      // For binary PDFs, try alternative text extraction methods
+      console.log('Attempting enhanced text extraction from binary PDF...')
+      
+      // Try different encodings and extract readable portions
+      const extractedText = this.extractReadableTextFromBinary(buffer)
+      
+      if (extractedText.length > 100) {
+        console.log(`Extracted ${extractedText.length} characters using binary extraction`)
+        return extractedText
+      }
+      
+      // If we have AI available, use it as a last resort
+      if (this.groq) {
+        console.log('Using AI for text extraction...')
+        return await this.extractTextWithAI(buffer, filename)
+      }
+      
+      console.log('Binary PDF detected - cannot extract text without AI or additional PDF processing libraries')
       console.log('Please provide a text-based resume file (.txt) or a PDF that contains selectable text')
+      console.log('Alternatively, configure GROQ_API_KEY in .env.local for AI-powered text extraction')
       return ''
     } catch (error) {
       console.error('Error processing PDF:', error)
+      return ''
+    }
+  }
+
+  private extractReadableTextFromBinary(buffer: Buffer): string {
+    try {
+      // Convert buffer to string and extract readable portions
+      const rawText = buffer.toString('utf-8')
+      
+      // Extract email addresses
+      const emails = rawText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []
+      
+      // Extract phone numbers
+      const phones = rawText.match(/(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}/g) || []
+      
+      // Extract URLs
+      const urls = rawText.match(/https?:\/\/[^\s<>"{}|\\^`[\]]+/g) || []
+      
+      // Extract words that look like names (capitalized words)
+      const nameWords = rawText.match(/\b[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\b/g) || []
+      
+      // Extract common resume keywords and surrounding text
+      const resumeKeywords = [
+        'experience', 'education', 'skills', 'summary', 'objective',
+        'linkedin', 'github', 'portfolio', 'developer', 'engineer',
+        'university', 'college', 'bachelor', 'master', 'degree',
+        // Add hyperlink-related keywords
+        'profile', 'website', 'connect', 'visit', 'check out',
+        'personal site', 'my github', 'my linkedin', 'social media'
+      ]
+      
+      let extractedParts: string[] = []
+      
+      // Add found emails, phones, and URLs
+      extractedParts.push(...emails, ...phones, ...urls)
+      
+      // Add potential names
+      if (nameWords.length > 0 && nameWords[0]) {
+        extractedParts.push(nameWords[0]) // Take the first name-like match
+      }
+      
+      // Extract text around resume keywords
+      for (const keyword of resumeKeywords) {
+        const regex = new RegExp(`.{0,50}${keyword}.{0,100}`, 'gi')
+        const matches = rawText.match(regex) || []
+        for (const match of matches) {
+          // Clean up the match
+          const cleaned = match.replace(/[^\w\s@.\-:\/]/g, ' ').trim()
+          if (cleaned.length > 10) {
+            extractedParts.push(cleaned)
+          }
+        }
+      }
+      
+      // Remove duplicates and join
+      const uniqueParts = Array.from(new Set(extractedParts))
+      const result = uniqueParts.join('\n').trim()
+      
+      return result
+    } catch (error) {
+      console.error('Binary text extraction failed:', error)
       return ''
     }
   }
@@ -361,54 +474,148 @@ export class ResumeParser {
   private extractSocialLinks(text: string): { linkedin?: string; github?: string; portfolio?: string } {
     const socialLinks: { linkedin?: string; github?: string; portfolio?: string } = {}
     
-    // Extract LinkedIn - look for "LinkedIn: URL" format
-    const linkedinPattern = /linkedin\s*:?\s*(https?:\/\/[^\s]+)/gi
-    const linkedinMatch = text.match(linkedinPattern)
+    // Enhanced patterns to catch various hyperlink formats
     
-    if (linkedinMatch) {
-      // Extract just the URL part after "LinkedIn:"
-      const urlMatch = linkedinMatch[0].match(/https?:\/\/[^\s]+/)
-      if (urlMatch) {
-        socialLinks.linkedin = urlMatch[0]
+    // Extract LinkedIn - multiple patterns for hyperlinks
+    const linkedinPatterns = [
+      /linkedin\s*:?\s*(https?:\/\/[^\s]+)/gi, // "LinkedIn: URL" format
+      /https?:\/\/(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_]+\/?/gi, // Direct LinkedIn URLs
+      /linkedin\.com\/in\/[a-zA-Z0-9-_]+/gi, // LinkedIn without protocol
+      /(?:linkedin|li)\s*[:.]?\s*([a-zA-Z0-9-_]+)(?:\s|$)/gi, // "LinkedIn: username" format
+      /(?:@|profile:?\s*)?linkedin\.com\/in\/([a-zA-Z0-9-_]+)/gi // Various prefixes
+    ]
+    
+    for (const pattern of linkedinPatterns) {
+      const matches = text.match(pattern)
+      if (matches) {
+        let url = matches[0]
+        // Clean up the URL
+        if (url.includes('linkedin.com/in/')) {
+          // Extract just the LinkedIn part
+          const linkedinMatch = url.match(/linkedin\.com\/in\/[a-zA-Z0-9-_]+/i)
+          if (linkedinMatch) {
+            url = linkedinMatch[0]
+            if (!url.startsWith('http')) {
+              url = 'https://www.' + url
+            }
+            socialLinks.linkedin = url
+            break
+          }
+        } else if (url.includes('https://')) {
+          socialLinks.linkedin = url
+          break
+        }
       }
     }
     
-    // Extract GitHub - look for "GitHub: URL" format
-    const githubPattern = /github\s*:?\s*(https?:\/\/[^\s]+)/gi
-    const githubMatch = text.match(githubPattern)
+    // Extract GitHub - multiple patterns for hyperlinks  
+    const githubPatterns = [
+      /github\s*:?\s*(https?:\/\/[^\s]+)/gi, // "GitHub: URL" format
+      /https?:\/\/(?:www\.)?github\.com\/[a-zA-Z0-9-_]+\/?/gi, // Direct GitHub URLs
+      /github\.com\/[a-zA-Z0-9-_]+/gi, // GitHub without protocol
+      /(?:github|gh)\s*[:.]?\s*([a-zA-Z0-9-_]+)(?:\s|$)/gi, // "GitHub: username" format
+      /(?:@|profile:?\s*)?github\.com\/([a-zA-Z0-9-_]+)/gi // Various prefixes
+    ]
     
-    if (githubMatch) {
-      // Extract just the URL part after "GitHub:"
-      const urlMatch = githubMatch[0].match(/https?:\/\/[^\s]+/)
-      if (urlMatch) {
-        socialLinks.github = urlMatch[0]
+    for (const pattern of githubPatterns) {
+      const matches = text.match(pattern)
+      if (matches) {
+        let url = matches[0]
+        // Clean up the URL
+        if (url.includes('github.com/')) {
+          // Extract just the GitHub part
+          const githubMatch = url.match(/github\.com\/[a-zA-Z0-9-_]+/i)
+          if (githubMatch) {
+            url = githubMatch[0]
+            if (!url.startsWith('http')) {
+              url = 'https://' + url
+            }
+            socialLinks.github = url
+            break
+          }
+        } else if (url.includes('https://')) {
+          socialLinks.github = url
+          break
+        }
       }
     }
     
-    // Extract Portfolio - look for "Portfolio: URL" format
-    const portfolioPattern = /portfolio\s*:?\s*(https?:\/\/[^\s]+)/gi
-    const portfolioMatch = text.match(portfolioPattern)
+    // Extract Portfolio - enhanced patterns for various website formats
+    const portfolioPatterns = [
+      /portfolio\s*:?\s*(https?:\/\/[^\s]+)/gi, // "Portfolio: URL" format
+      /website\s*:?\s*(https?:\/\/[^\s]+)/gi, // "Website: URL" format
+      /personal\s*site\s*:?\s*(https?:\/\/[^\s]+)/gi, // "Personal site: URL" format
+      /https?:\/\/(?:www\.)?[a-zA-Z0-9-]+\.(?:com|net|org|io|dev|me|tech|app|co)(?:\/[^\s]*)?/gi, // General URLs
+      /(?:www\.)?[a-zA-Z0-9-]+\.(?:dev|me|tech|app|portfolio|site)(?:\/[^\s]*)?/gi // Common portfolio domains
+    ]
     
-    if (portfolioMatch) {
-      // Extract just the URL part after "Portfolio:"
-      const urlMatch = portfolioMatch[0].match(/https?:\/\/[^\s]+/)
-      if (urlMatch) {
-        socialLinks.portfolio = urlMatch[0]
+    for (const pattern of portfolioPatterns) {
+      const matches = text.match(pattern)
+      if (matches) {
+        for (const match of matches) {
+          let url = match.trim()
+          
+          // Skip if it's already a LinkedIn or GitHub URL
+          if (url.includes('linkedin.com') || url.includes('github.com')) {
+            continue
+          }
+          
+          // Clean up the URL
+          if (url.includes('http')) {
+            const urlMatch = url.match(/https?:\/\/[^\s]+/)
+            if (urlMatch) {
+              socialLinks.portfolio = urlMatch[0]
+              break
+            }
+          } else {
+            // Add protocol if missing
+            if (url.includes('.')) {
+              socialLinks.portfolio = 'https://' + url
+              break
+            }
+          }
+        }
+        if (socialLinks.portfolio) break
       }
     }
     
-    // Also look for standalone URLs in the text
+    // Look for hyperlink text patterns that might indicate clickable links
+    // Sometimes PDFs show "Click here" or email-like text for hyperlinks
     if (!socialLinks.linkedin) {
-      const standaloneLinkedin = text.match(/https?:\/\/(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_]+\/?/gi)
-      if (standaloneLinkedin) {
-        socialLinks.linkedin = standaloneLinkedin[0]
+      const linkedinTextPatterns = [
+        /(?:my\s+)?linkedin(?:\s+profile)?(?:\s*[:.])?/gi,
+        /connect\s+(?:with\s+me\s+)?on\s+linkedin/gi,
+        /linkedin\.com/gi
+      ]
+      
+      for (const pattern of linkedinTextPatterns) {
+        if (pattern.test(text)) {
+          // Try to extract username from nearby text
+          const usernameMatch = text.match(/(?:linkedin\.com\/in\/|@)([a-zA-Z0-9-_]+)/i)
+          if (usernameMatch) {
+            socialLinks.linkedin = `https://www.linkedin.com/in/${usernameMatch[1]}`
+            break
+          }
+        }
       }
     }
     
     if (!socialLinks.github) {
-      const standaloneGithub = text.match(/https?:\/\/(?:www\.)?github\.com\/[a-zA-Z0-9-_]+\/?/gi)
-      if (standaloneGithub) {
-        socialLinks.github = standaloneGithub[0]
+      const githubTextPatterns = [
+        /(?:my\s+)?github(?:\s+profile)?(?:\s*[:.])?/gi,
+        /check\s+(?:out\s+)?my\s+github/gi,
+        /github\.com/gi
+      ]
+      
+      for (const pattern of githubTextPatterns) {
+        if (pattern.test(text)) {
+          // Try to extract username from nearby text
+          const usernameMatch = text.match(/(?:github\.com\/|@)([a-zA-Z0-9-_]+)/i)
+          if (usernameMatch) {
+            socialLinks.github = `https://github.com/${usernameMatch[1]}`
+            break
+          }
+        }
       }
     }
     
@@ -430,5 +637,260 @@ export class ResumeParser {
     return sectionKeywords.some(keyword => lowerLine.includes(keyword))
   }
 
+  private async extractTextWithAI(buffer: Buffer, filename: string): Promise<string> {
+    if (!this.groq) {
+      console.log('Groq not available for AI text extraction')
+      return ''
+    }
 
+    try {
+      // For binary PDFs, we'll try to extract any readable text and let AI help structure it
+      // Limit to first 15KB to stay within token limits (roughly 3000-4000 tokens)
+      const maxSize = 15000
+      const rawContent = buffer.toString('utf-8', 0, Math.min(buffer.length, maxSize))
+      
+      if (rawContent.length < 100) {
+        console.log('Insufficient content for AI processing')
+        return ''
+      }
+
+      // Pre-process the content to remove excessive noise and focus on resume-like content
+      const preprocessedContent = this.preprocessContentForAI(rawContent)
+      
+      if (preprocessedContent.length < 50) {
+        console.log('No meaningful content found after preprocessing')
+        return ''
+      }
+
+      const prompt = `Extract resume information from this raw text. The text may contain formatting artifacts.
+
+Extract and return ONLY the readable resume content including:
+- Name, email, phone
+- Work experience 
+- Education
+- Skills
+- Social media URLs (LinkedIn, GitHub, Portfolio)
+
+Raw text (${preprocessedContent.length} chars):
+${preprocessedContent}
+
+Return only clean, readable resume content as plain text.`
+
+      const completion = await this.groq.chat.completions.create({
+        model: "llama-3.1-8b-instant", // Fast model for text extraction
+        messages: [
+          {
+            role: "system",
+            content: "Extract meaningful resume content from raw text. Remove artifacts and return clean text only."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.1,
+        max_tokens: 1500 // Reduced token limit
+      })
+
+      const extractedText = completion.choices[0]?.message?.content?.trim() || ''
+      
+      if (extractedText.length > 50) {
+        console.log(`AI extracted ${extractedText.length} characters of text`)
+        return extractedText
+      } else {
+        console.log('AI extraction did not yield sufficient content')
+        return ''
+      }
+    } catch (error) {
+      console.error('AI text extraction failed:', error)
+      // If AI fails due to token limits, try the binary extraction method
+      console.log('Falling back to binary text extraction...')
+      return this.extractReadableTextFromBinary(buffer)
+    }
+  }
+
+  private preprocessContentForAI(rawContent: string): string {
+    try {
+      // Remove excessive whitespace and non-printable characters
+      let cleaned = rawContent.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ' ')
+      
+      // Split into lines and filter for meaningful content
+      const lines = cleaned.split(/[\r\n]+/)
+      const meaningfulLines: string[] = []
+      
+      // Patterns that indicate resume content
+      const resumePatterns = [
+        /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/, // Email
+        /\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}/, // Phone
+        /linkedin\.com|github\.com|portfolio/i, // Social links
+        /experience|education|skills|summary|objective/i, // Resume sections
+        /engineer|developer|manager|analyst|designer/i, // Job titles
+        /university|college|bachelor|master|degree/i, // Education
+        /javascript|python|react|node|sql|html|css/i, // Technical skills
+        /\b[A-Z][a-z]+ [A-Z][a-z]+\b/, // Names
+        /\b(19|20)\d{2}\b/, // Years
+        /\b\w+\s*\|\s*\w+\s*\|\s*\d{4}/ // Pipe-separated format
+      ]
+      
+      for (const line of lines) {
+        const trimmed = line.trim()
+        if (trimmed.length < 5) continue
+        
+        // Check if line contains resume-relevant content
+        const hasResumeContent = resumePatterns.some(pattern => pattern.test(trimmed))
+        const hasReadableText = /[a-zA-Z]/.test(trimmed) && trimmed.length <= 200
+        
+        if (hasResumeContent || hasReadableText) {
+          meaningfulLines.push(trimmed)
+        }
+        
+        // Stop if we have enough content (roughly 2000-3000 tokens worth)
+        if (meaningfulLines.join('\n').length > 8000) {
+          break
+        }
+      }
+      
+      const result = meaningfulLines.join('\n').trim()
+      console.log(`Preprocessed content: ${rawContent.length} -> ${result.length} characters`)
+      
+      return result
+    } catch (error) {
+      console.error('Content preprocessing failed:', error)
+      // Return first 8KB as fallback
+      return rawContent.substring(0, 8000)
+    }
+  }
+
+  private async extractSocialLinksWithAI(text: string, parsedResume: ParsedResume): Promise<{ linkedin?: string; github?: string; portfolio?: string }> {
+    if (!this.groq || !text || text.trim().length === 0) {
+      return {}
+    }
+
+    try {
+      // Limit text size for social link extraction to avoid token limits
+      const maxTextLength = 3000
+      const limitedText = text.length > maxTextLength ? text.substring(0, maxTextLength) : text
+      
+      const prompt = `Extract ONLY real social media links that actually exist in this resume text. Do NOT create or guess any links.
+
+STRICT RULES:
+- Only extract URLs that are explicitly written in the text
+- Do NOT make up usernames or domains
+- Do NOT guess or infer links from names
+- If no real URL is found for a platform, omit that field entirely
+- Only return links that you can see in the actual text
+
+Resume text:
+${limitedText}
+
+Candidate: ${parsedResume.name || 'Unknown'}
+
+Look for actual URLs like:
+- https://linkedin.com/in/actual-username
+- github.com/real-username  
+- portfolio-domain.com
+
+ONLY return JSON with links that actually appear in the text. If no real links found, return empty object {}:
+
+{
+  "linkedin": "only if real URL found in text",
+  "github": "only if real URL found in text", 
+  "portfolio": "only if real URL found in text"
+}`
+
+      const completion = await this.groq.chat.completions.create({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "system",
+            content: "You are a strict URL extractor. ONLY extract URLs that actually exist in the text. Never create, guess, or hallucinate links. If no real URLs found, return empty JSON {}."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.0, // Set to 0 for maximum accuracy, no creativity
+        max_tokens: 300,
+        response_format: { type: "json_object" }
+      })
+
+      const content = completion.choices[0]?.message?.content
+      if (!content) {
+        return {}
+      }
+
+      try {
+        const socialLinks = JSON.parse(content)
+        console.log('AI extracted social links:', socialLinks)
+        
+        // Extra validation - check if extracted links contain real domains/usernames
+        const validatedLinks: { linkedin?: string; github?: string; portfolio?: string } = {}
+        
+        if (socialLinks.linkedin && this.isValidURL(socialLinks.linkedin) && this.isRealisticLink(socialLinks.linkedin, 'linkedin')) {
+          validatedLinks.linkedin = socialLinks.linkedin
+        }
+        if (socialLinks.github && this.isValidURL(socialLinks.github) && this.isRealisticLink(socialLinks.github, 'github')) {
+          validatedLinks.github = socialLinks.github
+        }
+        if (socialLinks.portfolio && this.isValidURL(socialLinks.portfolio) && this.isRealisticLink(socialLinks.portfolio, 'portfolio')) {
+          validatedLinks.portfolio = socialLinks.portfolio
+        }
+        
+        return validatedLinks
+      } catch (parseError) {
+        console.error('Failed to parse AI social links response:', content)
+        return {}
+      }
+    } catch (error) {
+      console.error('AI social link extraction failed:', error)
+      return {}
+    }
+  }
+
+  private isRealisticLink(url: string, platform: string): boolean {
+    try {
+      const urlObj = new URL(url)
+      
+      // Check for obviously fake or too short usernames
+      const pathname = urlObj.pathname
+      
+      if (platform === 'linkedin') {
+        if (!urlObj.hostname.includes('linkedin.com')) return false
+        const username = pathname.split('/').pop()
+        if (!username || username.length < 3 || username.length > 50) return false
+        // Check for obviously fake patterns
+        if (/^[A-Z][a-z][A-Z]$/.test(username)) return false // Like "AdI"
+      }
+      
+      if (platform === 'github') {
+        if (!urlObj.hostname.includes('github.com')) return false
+        const username = pathname.split('/').pop()
+        if (!username || username.length < 2 || username.length > 39) return false
+        // Check for obviously fake patterns
+        if (/^[A-Z][a-z][A-Z]$/.test(username)) return false // Like "AdI"
+      }
+      
+      if (platform === 'portfolio') {
+        // Check for obviously fake domains
+        if (urlObj.hostname.length < 4) return false
+        if (!/\.[a-z]{2,}$/.test(urlObj.hostname)) return false
+        // Check for patterns like "ad-i.com" which look generated
+        if (/^[a-z]{1,2}-[a-z]{1,2}\.[a-z]{2,3}$/.test(urlObj.hostname)) return false
+      }
+      
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  private isValidURL(string: string): boolean {
+    try {
+      const url = new URL(string)
+      return url.protocol === 'http:' || url.protocol === 'https:'
+    } catch {
+      return false
+    }
+  }
 } 
