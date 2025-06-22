@@ -777,6 +777,18 @@ export default function Dashboard() {
     }
   }
 
+  // Helper function to safely format dates
+  const formatDate = (date: Date | string | undefined | null): string => {
+    if (!date) return 'N/A'
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date
+      if (isNaN(dateObj.getTime())) return 'Invalid Date'
+      return dateObj.toLocaleDateString()
+    } catch {
+      return 'Invalid Date'
+    }
+  }
+
 
 
   return (
@@ -972,7 +984,7 @@ export default function Dashboard() {
                     <div className="space-y-3 pt-4 border-t border-gray-100">
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
                         <Calendar className="h-4 w-4" />
-                        <span>Created {job.createdAt.toLocaleDateString()}</span>
+                        <span>Created {formatDate(job.createdAt)}</span>
                       </div>
                       
                       {/* Job Action Buttons */}
@@ -1075,7 +1087,7 @@ export default function Dashboard() {
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-gray-500">Uploaded</div>
-                        <div className="text-sm font-medium">{resume.uploadedAt.toLocaleDateString()}</div>
+                        <div className="text-sm font-medium">{formatDate(resume.uploadedAt)}</div>
                       </div>
                     </div>
                   </CardHeader>
@@ -1326,7 +1338,7 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-purple-600">
-                      {new Date().toLocaleDateString() === selectedJob.createdAt.toLocaleDateString() ? 0 : Math.floor(Math.random() * 3)}
+                                             {new Date().toLocaleDateString() === formatDate(selectedJob.createdAt) ? 0 : Math.floor(Math.random() * 3)}
                     </div>
                     <div className="text-sm text-gray-600">Hired</div>
                   </div>
@@ -1378,7 +1390,7 @@ export default function Dashboard() {
                       )}
                     </CardTitle>
                     <CardDescription>
-                      {selectedResume.email} • Uploaded {selectedResume.uploadedAt.toLocaleDateString()}
+                                             {selectedResume.email} • Uploaded {formatDate(selectedResume.uploadedAt)}
                     </CardDescription>
                   </div>
                 </div>
@@ -2208,7 +2220,7 @@ export default function Dashboard() {
                       File: <span className="font-medium">{selectedResume.fileName}</span>
                     </p>
                     <p className="text-sm text-gray-500 mb-4">
-                      Uploaded: {selectedResume.uploadedAt.toLocaleDateString()}
+                                              Uploaded: {formatDate(selectedResume.uploadedAt)}
                     </p>
                     <div className="space-y-2">
                       <p className="text-xs text-gray-400">
