@@ -13,15 +13,15 @@ import { ProgressUpdate, Resume, Job } from "@/types"
 // Mock data - in real app this would come from API
   const mockResumes: Resume[] = [
   {
-    id: 'enhanced-demo',
-    candidateName: 'Marcus Chen',
-    email: 'marcus.chen@email.com',
+    id: 'abdullah-sahapdeen',
+    candidateName: 'Abdullah Sahapdeen',
+    email: 'asahapde@gmail.com',
     phone: '+1 (555) 123-4567',
     uploadedAt: new Date('2024-01-20'),
-    fileName: 'marcus_chen_resume.pdf',
+    fileName: 'abdullah_sahapdeen_resume.pdf',
           parsedData: {
-        name: 'Marcus Chen',
-        email: 'marcus.chen@email.com',
+        name: 'Abdullah Sahapdeen',
+        email: 'asahapde@gmail.com',
       phone: '+1 (555) 123-4567',
       summary: 'Experienced Software Engineer with 5+ years of expertise in full-stack development, AI/ML integration, and scalable system architecture.',
       experience: [
@@ -42,9 +42,9 @@ import { ProgressUpdate, Resume, Job } from "@/types"
       ],
       skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'AWS', 'Docker', 'Machine Learning'],
               socialLinks: {
-          linkedin: 'https://linkedin.com/in/marcus-chen-dev',
-          github: 'https://github.com/marcuschen',
-          portfolio: 'https://marcuschen.dev'
+          linkedin: 'https://linkedin.com/in/abdullah-sahapdeen',
+          github: 'https://github.com/asahapde',
+          portfolio: 'https://asahap.com'
         }
     },
     status: 'pending',
@@ -91,15 +91,15 @@ import { ProgressUpdate, Resume, Job } from "@/types"
     aiScore: 74
   },
   {
-    id: 'red-flag-demo',
-    candidateName: 'Alex Smith',
-    email: 'alex.smith@email.com',
+    id: 'noor-ahamed-sadique',
+    candidateName: 'Noor Ahamed Sadique',
+    email: 'noor.ahamed@email.com',
     phone: '+1 (555) 444-5555',
     uploadedAt: new Date('2024-01-17'),
-    fileName: 'ALEX_SMITH_RESUME.pdf',
+    fileName: 'NOOR_AHAMED_SADIQUE_RESUME.pdf',
     parsedData: {
-      name: 'Alex Smith',
-      email: 'alex.smith@email.com',
+      name: 'Noor Ahamed Sadique',
+      email: 'noor.ahamed@email.com',
       phone: '+1 (555) 444-5555',
       summary: 'Senior Full-Stack Engineer with 8+ years of experience building scalable applications at Fortune 500 companies. Expert in React, Node.js, and cloud architecture.',
       experience: [
@@ -132,9 +132,9 @@ import { ProgressUpdate, Resume, Job } from "@/types"
       ],
       skills: ['React', 'Node.js', 'Python', 'Go', 'Java', 'Kubernetes', 'Docker', 'AWS', 'GCP', 'Machine Learning'],
       socialLinks: {
-        linkedin: 'https://linkedin.com/in/alex-smith-dev',
-        github: 'https://github.com/alexsmith',
-        portfolio: 'https://alexsmith.dev'
+                  linkedin: 'https://linkedin.com/in/noor-ahamed-sadique',
+        github: 'https://github.com/noorahamed',
+        portfolio: 'https://noorahamed.dev'
       }
     },
     status: 'pending',

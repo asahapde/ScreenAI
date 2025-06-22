@@ -16,19 +16,20 @@ export class ResumeParser {
   async parseFile(buffer: Buffer, filename: string): Promise<ParsedResume> {
     // Check filename for specific candidates
     const lowerFilename = filename.toLowerCase()
+    console.log(`Processing file: "${filename}" -> "${lowerFilename}"`)
     
-    if (lowerFilename.includes('alex_smith') || lowerFilename.includes('alex-smith') || lowerFilename.includes('alexsmith')) {
-      console.log('Detected Alex Smith resume - returning red flag profile')
+    if (lowerFilename.includes('noor_ahamed_sadique') || lowerFilename.includes('noor-ahamed-sadique') || lowerFilename.includes('noorahamedsadique')) {
+      console.log('✅ Detected Noor Ahamed Sadique resume - returning red flag profile')
       return this.getRedFlagResumeData()
     }
     
-    if (lowerFilename.includes('marcus_chen') || lowerFilename.includes('marcus-chen') || lowerFilename.includes('marcuschen')) {
-      console.log('Detected Marcus Chen resume - returning enhanced profile')
+    if (lowerFilename.includes('abdullah_sahapdeen') || lowerFilename.includes('abdullah-sahapdeen') || lowerFilename.includes('abdullahsahapdeen')) {
+      console.log('✅ Detected Abdullah Sahapdeen resume - returning enhanced profile')
       return this.getEnhancedResumeData(filename)
     }
     
     // Default to enhanced resume data for demo purposes
-    console.log('Returning enhanced resume data for any upload')
+    console.log('⚠️ No specific candidate detected, returning enhanced resume data for any upload')
     return this.getEnhancedResumeData(filename)
   }
 
@@ -76,10 +77,10 @@ export class ResumeParser {
     const rawText = buffer.toString('utf-8')
     
     // Check if this might be Abdullah's resume
-          if (rawText.toLowerCase().includes('marcus') ||
-          rawText.toLowerCase().includes('chen') ||
-          rawText.toLowerCase().includes('marcus.chen')) {
-        // Return Marcus Chen's structured data
+          if (rawText.toLowerCase().includes('abdullah') ||
+          rawText.toLowerCase().includes('sahapdeen') ||
+          rawText.toLowerCase().includes('asahapde')) {
+        // Return Abdullah Sahapdeen's structured data
       const enhancedData = this.getEnhancedResumeData()
               return `
         Name: ${enhancedData.name}
@@ -215,11 +216,11 @@ export class ResumeParser {
   }
 
   private parseResumeText(text: string): ParsedResume {
-    // Check if this might be Marcus Chen's resume by looking for his name or email
-    if (text.toLowerCase().includes('marcus') || 
-        text.toLowerCase().includes('chen') || 
-        text.toLowerCase().includes('marcus.chen') ||
-        text.toLowerCase().includes('marcus.chen@email.com')) {
+    // Check if this might be Abdullah Sahapdeen's resume by looking for his name or email
+    if (text.toLowerCase().includes('abdullah') || 
+        text.toLowerCase().includes('sahapdeen') || 
+        text.toLowerCase().includes('asahapde') ||
+        text.toLowerCase().includes('asahapde@gmail.com')) {
       return this.getEnhancedResumeData()
     }
 
@@ -917,8 +918,8 @@ ONLY return JSON with links that actually appear in the text. If no real links f
     private getEnhancedResumeData(filename?: string): ParsedResume {
     // Enhanced demo profile with impressive credentials
     return {
-      name: 'Marcus Chen',
-      email: 'marcus.chen@email.com',
+      name: 'Abdullah Sahapdeen',
+      email: 'asahapde@gmail.com',
         phone: '+1 (555) 123-4567',
         summary: 'Experienced Software Engineer with 5+ years of expertise in full-stack development, AI/ML integration, and scalable system architecture. Proven track record in building high-performance applications using React, Node.js, Python, and cloud technologies. Strong background in startup environments with experience leading technical teams and delivering products from concept to production.',
         experience: [
@@ -970,10 +971,10 @@ ONLY return JSON with links that actually appear in the text. If no real links f
           'Machine Learning Engineer Certification'
         ],
         socialLinks: {
-          linkedin: 'https://linkedin.com/in/marcus-chen-dev',
-          github: 'https://github.com/marcuschen',
-          portfolio: 'https://marcuschen.dev',
-          twitter: 'https://twitter.com/marcuschen'
+          linkedin: 'https://linkedin.com/in/abdullah-sahapdeen',
+          github: 'https://github.com/asahapde',
+          portfolio: 'https://asahap.com',
+          twitter: 'https://twitter.com/asahapde'
         }
       }
   }
@@ -1027,8 +1028,8 @@ ONLY return JSON with links that actually appear in the text. If no real links f
   private getRedFlagResumeData(): ParsedResume {
     // Red flag profile with inflated credentials that don't match online presence
     return {
-      name: 'Alex Smith',
-      email: 'alex.smith@email.com',
+      name: 'Noor Ahamed Sadique',
+      email: 'noor.ahamed@email.com',
       phone: '+1 (555) 444-5555',
       summary: 'Experienced Full-Stack Developer with 6+ years building enterprise applications at top tech companies. Led multiple high-impact projects serving millions of users. Expert in cutting-edge technologies including AI/ML, blockchain, and quantum computing.',
               experience: [
@@ -1074,9 +1075,9 @@ ONLY return JSON with links that actually appear in the text. If no real links f
           'WordPress Developer Badge'
         ],
       socialLinks: {
-        linkedin: 'https://linkedin.com/in/alex-smith-dev',
-        github: 'https://github.com/alexsmith',
-        portfolio: 'https://alexsmith.dev'
+        linkedin: 'https://linkedin.com/in/noor-ahamed-sadique',
+        github: 'https://github.com/noorahamed',
+        portfolio: 'https://noorahamed.dev'
       }
     }
   }

@@ -438,9 +438,9 @@ export default function Dashboard() {
       formData.append("resume", resume)
       formData.append("candidateData", JSON.stringify({
         socialLinks: {
-          linkedin: uploadFormData.linkedin || 'https://linkedin.com/in/marcus-chen-dev',
-          github: uploadFormData.github || 'https://github.com/marcuschen',
-          portfolio: uploadFormData.portfolio || 'https://marcuschen.dev'
+          linkedin: uploadFormData.linkedin || 'https://linkedin.com/in/abdullah-sahapdeen',
+          github: uploadFormData.github || 'https://github.com/asahapde',
+          portfolio: uploadFormData.portfolio || 'https://asahap.com'
         },
         extraContext: uploadFormData.extraContext || 'Experienced Software Engineer with expertise in full-stack development and scalable system architecture.',
         jobDescription: uploadFormData.selectedJobId ? 
@@ -471,15 +471,15 @@ export default function Dashboard() {
         let candidateId: string
         const fileName = resume.name.toLowerCase()
         
-        if (fileName.includes('marcus_chen') || fileName.includes('marcus-chen') || fileName.includes('marcuschen')) {
-          // Route to enhanced/good analysis for Marcus Chen
-          candidateId = 'enhanced-demo'
-        } else if (fileName.includes('alex_smith') || fileName.includes('alex-smith') || fileName.includes('alexsmith')) {
-          // Route to red flag analysis for Alex Smith
-          candidateId = 'red-flag-demo'
+        if (fileName.includes('noor_ahamed_sadique') || fileName.includes('noor-ahamed-sadique') || fileName.includes('noorahamedsadique')) {
+          // Route to red flag analysis for Noor Ahamed Sadique
+          candidateId = 'noor-ahamed-sadique'
+        } else if (fileName.includes('abdullah_sahapdeen') || fileName.includes('abdullah-sahapdeen') || fileName.includes('abdullahsahapdeen')) {
+          // Route to enhanced/good analysis for Abdullah Sahapdeen
+          candidateId = 'abdullah-sahapdeen'
         } else {
           // Default to enhanced analysis
-          candidateId = 'enhanced-demo'
+          candidateId = 'abdullah-sahapdeen'
         }
         
         // Simulate processing time with status updates

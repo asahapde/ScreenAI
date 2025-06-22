@@ -54,7 +54,7 @@ export class WebScraper {
       }
 
       // Check if this should use red flag demo profile
-      if (url.includes('alexsmith') || username === 'alexsmith') {
+      if (url.includes('noorahamed') || username === 'noorahamed') {
         return this.getRedFlagGitHubProfile()
       }
 
@@ -73,7 +73,7 @@ export class WebScraper {
     }
 
     // Check if this should use red flag demo profile
-    if (url.includes('alex-smith-dev')) {
+    if (url.includes('noor-ahamed-sadique')) {
       return this.getRedFlagLinkedInProfile()
     }
 
@@ -462,7 +462,7 @@ export class WebScraper {
 
   private getEnhancedGitHubProfile(): GitHubProfile {
     return {
-      username: 'marcuschen',
+      username: 'asahapde',
       profile: 'Senior Software Engineer passionate about building scalable web applications and AI-powered solutions. Open source contributor with expertise in React, Node.js, and Python.',
       repositories: [
         {
@@ -642,7 +642,7 @@ export class WebScraper {
       publicGists: 23,
       location: 'San Francisco, CA',
       company: 'TechFlow Solutions',
-      blog: 'https://marcuschen.dev/blog',
+              blog: 'https://asahap.com/blog',
       hireable: true,
       lastActive: '2024-01-20',
       topRepositories: [
@@ -680,7 +680,7 @@ export class WebScraper {
 
   private getEnhancedLinkedInProfile(): LinkedInProfile {
     return {
-      name: 'Marcus Chen',
+      name: 'Abdullah Sahapdeen',
       profile: 'Senior Software Engineer at TechFlow Solutions',
       headline: 'Senior Software Engineer | Full-Stack Developer | AI/ML Enthusiast | Building Scalable Solutions',
       experience: [
@@ -928,7 +928,7 @@ export class WebScraper {
 
   private getRedFlagGitHubProfile(): GitHubProfile {
     return {
-      username: 'alexsmith',
+      username: 'noorahamed',
       profile: 'Full-Stack Developer | AI/ML Expert | Blockchain Enthusiast',
       repositories: [
         {
@@ -1056,7 +1056,7 @@ export class WebScraper {
 
   private getRedFlagLinkedInProfile(): LinkedInProfile {
     return {
-      name: 'Alex Smith',
+      name: 'Noor Ahamed Sadique',
       profile: 'Full-Stack Developer | AI/ML Expert | Blockchain Specialist',
       headline: 'Senior Software Engineer | Leading AI Innovation | 6+ Years Experience',
       experience: [

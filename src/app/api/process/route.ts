@@ -262,9 +262,12 @@ async function sendUpdate(
   await new Promise(resolve => setTimeout(resolve, 100))
 }
 
-function createMockAnalysis(candidateId: string, candidateData: CandidateData): AnalysisResult {
-  // Enhanced profile for Marcus Chen
-  if (candidateId === 'enhanced-demo') {
+  function createMockAnalysis(candidateId: string, candidateData: CandidateData): AnalysisResult {
+    console.log(`🔍 Process API - Creating analysis for candidateId: "${candidateId}"`)
+    
+    // Enhanced profile for Abdullah Sahapdeen
+    if (candidateId === 'abdullah-sahapdeen') {
+      console.log('✅ Using Abdullah Sahapdeen enhanced profile');
     return {
       id: `analysis_${candidateId}`,
       candidateId,
@@ -347,13 +350,14 @@ function createMockAnalysis(candidateId: string, candidateData: CandidateData): 
         }
       ],
       recommendation: "strong_match",
-      summary: "Marcus Chen is an exceptional candidate with outstanding technical skills, proven leadership experience, and a stellar online presence. His GitHub profile demonstrates consistent high-quality contributions, and his experience scaling AI platforms makes him an ideal fit for senior engineering roles.",
+      summary: "Abdullah Sahapdeen is an exceptional candidate with outstanding technical skills, proven leadership experience, and a stellar online presence. His GitHub profile demonstrates consistent high-quality contributions, and his experience scaling AI platforms makes him an ideal fit for senior engineering roles.",
       createdAt: new Date()
     }
   }
 
-  // Red flag profile for Alex Smith
-  if (candidateId === 'red-flag-demo') {
+      // Red flag profile for Noor Ahamed Sadique
+    if (candidateId === 'noor-ahamed-sadique') {
+      console.log('🔴 Using Noor Ahamed Sadique red flag profile');
     return {
       id: `analysis_${candidateId}`,
       candidateId,
@@ -540,17 +544,18 @@ function createMockAnalysis(candidateId: string, candidateData: CandidateData): 
         }
       ],
       recommendation: "poor_match",
-      summary: "⚠️ UNSUITABLE CANDIDATE - Alex Smith shows significant gaps between resume claims and actual capabilities. While he has basic web development skills (HTML, CSS, JavaScript), his resume greatly inflates his experience and expertise. Claims of AI/ML, blockchain, and quantum computing expertise are completely unsubstantiated. Only 3 years of actual experience, mostly with basic technologies. Educational background is limited to an associate degree. GitHub shows beginner-level projects with minimal community engagement. NOT RECOMMENDED for senior or advanced technical positions.",
+      summary: "⚠️ UNSUITABLE CANDIDATE - Noor Ahamed Sadique shows significant gaps between resume claims and actual capabilities. While he has basic web development skills (HTML, CSS, JavaScript), his resume greatly inflates his experience and expertise. Claims of AI/ML, blockchain, and quantum computing expertise are completely unsubstantiated. Only 3 years of actual experience, mostly with basic technologies. Educational background is limited to an associate degree. GitHub shows beginner-level projects with minimal community engagement. NOT RECOMMENDED for senior or advanced technical positions.",
       createdAt: new Date()
     }
   }
 
-  // Basic profile for Alex Johnson
+  // Default case - fallback to Abdullah's profile
+  console.log('⚠️ Using default fallback to Abdullah Sahapdeen profile');
   return {
     id: `analysis_${candidateId}`,
     candidateId,
-    fitScore: 74,
-    overallConfidence: 78,
+    fitScore: 96,
+    overallConfidence: 94,
     strengths: [
       {
         category: "Web Development",
@@ -624,8 +629,8 @@ function createMockAnalysis(candidateId: string, candidateData: CandidateData): 
         ]
       }
     ],
-    recommendation: "good_match",
-    summary: "Alex Johnson is a competent developer with solid fundamentals and steady growth potential. While not as experienced as senior candidates, they demonstrate good technical skills and would be a reliable team member for mid-level positions.",
+          recommendation: "strong_match",
+      summary: "Abdullah Sahapdeen is an exceptional candidate with outstanding technical skills, proven leadership experience, and a stellar online presence. His GitHub profile demonstrates consistent high-quality contributions, and his experience scaling AI platforms makes him an ideal fit for senior engineering roles.",
     createdAt: new Date()
   }
 } 

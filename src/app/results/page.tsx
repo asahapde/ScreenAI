@@ -60,15 +60,15 @@ import { StackOverflowAnalysis } from "@/components/analysis/stackoverflow-analy
 // Mock data with enhanced analysis
 const mockResumes: Resume[] = [
   {
-    id: 'enhanced-demo',
-    candidateName: 'Marcus Chen',
-    email: 'marcus.chen@email.com',
+    id: 'abdullah-sahapdeen',
+    candidateName: 'Abdullah Sahapdeen',
+    email: 'asahapde@gmail.com',
     phone: '+1 (555) 123-4567',
     uploadedAt: new Date('2024-01-20'),
-    fileName: 'marcus_chen_resume.pdf',
+    fileName: 'abdullah_sahapdeen_resume.pdf',
     parsedData: {
-      name: 'Marcus Chen',
-      email: 'marcus.chen@email.com',
+      name: 'Abdullah Sahapdeen',
+      email: 'asahapde@gmail.com',
       phone: '+1 (555) 123-4567',
       summary: 'Experienced Software Engineer with 5+ years of expertise in full-stack development, AI/ML integration, and scalable system architecture.',
       experience: [
@@ -101,12 +101,12 @@ const mockResumes: Resume[] = [
         'GraphQL', 'REST APIs', 'Machine Learning', 'TensorFlow', 'PyTorch',
         'Git', 'Linux', 'CI/CD', 'Jest', 'Cypress', 'Agile', 'Microservices'
       ],
-      socialLinks: {
-        linkedin: 'https://linkedin.com/in/marcus-chen-dev',
-        github: 'https://github.com/marcuschen',
-        portfolio: 'https://marcuschen.dev',
-        twitter: 'https://twitter.com/marcuschen'
-      }
+              socialLinks: {
+          linkedin: 'https://linkedin.com/in/abdullah-sahapdeen',
+          github: 'https://github.com/asahapde',
+          portfolio: 'https://asahap.com',
+          twitter: 'https://twitter.com/asahapde'
+        }
     },
     status: 'pending',
     jobId: '1',
@@ -165,15 +165,15 @@ const mockResumes: Resume[] = [
     notes: 'Solid candidate with good fundamentals and potential for growth.'
   },
   {
-    id: 'red-flag-demo',
-    candidateName: 'Alex Smith',
-    email: 'alex.smith@email.com',
+    id: 'noor-ahamed-sadique',
+    candidateName: 'Noor Ahamed Sadique',
+    email: 'noor.ahamed@email.com',
     phone: '+1 (555) 444-5555',
     uploadedAt: new Date('2024-01-17'),
-    fileName: 'ALEX_SMITH_RESUME.pdf',
+          fileName: 'NOOR_AHAMED_SADIQUE_RESUME.pdf',
     parsedData: {
-      name: 'Alex Smith',
-      email: 'alex.smith@email.com',
+      name: 'Noor Ahamed Sadique',
+      email: 'noor.ahamed@email.com',
       phone: '+1 (555) 444-5555',
       summary: 'Experienced Full-Stack Developer with 6+ years building enterprise applications at top tech companies. Led multiple high-impact projects serving millions of users. Expert in cutting-edge technologies including AI/ML, blockchain, and quantum computing.',
       experience: [
@@ -218,11 +218,11 @@ const mockResumes: Resume[] = [
         'AWS', 'GCP', 'GraphQL', 'REST APIs', 'MongoDB', 'PostgreSQL',
         'Redis', 'Machine Learning', 'TensorFlow', 'DevOps', 'CI/CD'
       ],
-      socialLinks: {
-        linkedin: 'https://linkedin.com/in/alex-smith-dev',
-        github: 'https://github.com/alexsmith',
-        portfolio: 'https://alexsmith.dev'
-      }
+              socialLinks: {
+          linkedin: 'https://linkedin.com/in/noor-ahamed-sadique',
+          github: 'https://github.com/noorahamed',
+          portfolio: 'https://noorahamed.dev'
+        }
     },
     status: 'pending',
     jobId: '1',
@@ -554,7 +554,7 @@ const generateRedFlagAnalysisData = () => {
     // GitHub Analysis Data
     githubData: {
       profile: {
-        name: 'Alex Smith',
+        name: 'Noor Ahamed Sadique',
         bio: 'Full-Stack Developer | AI/ML Expert | Blockchain Enthusiast',
         company: 'TechFlow Solutions',
         location: 'Unknown',
@@ -578,7 +578,7 @@ const generateRedFlagAnalysisData = () => {
           codeQuality: 35,
           resumeClaim: 'Led multiple high-impact projects serving millions of users',
           verification: 'disputed' as const,
-          url: 'https://github.com/alexsmith/my-portfolio'
+          url: 'https://github.com/noorahamed/my-portfolio'
         },
         {
           name: 'calculator-app',
@@ -592,7 +592,7 @@ const generateRedFlagAnalysisData = () => {
           codeQuality: 42,
           resumeClaim: 'Expert in cutting-edge technologies including AI/ML',
           verification: 'disputed' as const,
-          url: 'https://github.com/alexsmith/calculator-app'
+          url: 'https://github.com/noorahamed/calculator-app'
         },
         {
           name: 'wordpress-theme',
@@ -606,7 +606,7 @@ const generateRedFlagAnalysisData = () => {
           codeQuality: 38,
           resumeClaim: 'Blockchain and quantum computing expertise',
           verification: 'disputed' as const,
-          url: 'https://github.com/alexsmith/wordpress-theme'
+          url: 'https://github.com/noorahamed/wordpress-theme'
         }
       ],
       commits: [
@@ -616,7 +616,7 @@ const generateRedFlagAnalysisData = () => {
           additions: 12,
           deletions: 8,
           sha: 'xyz789',
-          url: 'https://github.com/alexsmith/my-portfolio/commit/xyz789'
+          url: 'https://github.com/noorahamed/my-portfolio/commit/xyz789'
         },
         {
           date: '2023-11-20',
@@ -624,7 +624,7 @@ const generateRedFlagAnalysisData = () => {
           additions: 3,
           deletions: 1,
           sha: 'abc456',
-          url: 'https://github.com/alexsmith/calculator-app/commit/abc456'
+          url: 'https://github.com/noorahamed/calculator-app/commit/abc456'
         }
       ],
       languageStats: {
@@ -878,7 +878,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
     // GitHub Analysis Data
     githubData: {
       profile: {
-        name: 'Marcus Chen',
+        name: 'Abdullah Sahapdeen',
         bio: 'Full-stack developer passionate about AI/ML and scalable systems',
         company: 'TechFlow Solutions',
         location: 'San Francisco, CA',
@@ -902,7 +902,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
           codeQuality: 94,
           resumeClaim: 'Led development of AI-powered recruitment platform serving 10,000+ users',
           verification: 'verified' as const,
-          url: 'https://github.com/marcuschen/screenai'
+          url: 'https://github.com/asahapde/screenai'
         },
         {
           name: 'microservices-ecommerce',
@@ -916,7 +916,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
           codeQuality: 91,
           resumeClaim: 'Built scalable microservices architecture',
           verification: 'verified' as const,
-          url: 'https://github.com/marcuschen/microservices-ecommerce'
+          url: 'https://github.com/asahapde/microservices-ecommerce'
         }
       ],
       commits: [
@@ -926,7 +926,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
           additions: 245,
           deletions: 32,
           sha: 'abc123',
-          url: 'https://github.com/marcuschen/screenai/commit/abc123'
+          url: 'https://github.com/asahapde/screenai/commit/abc123'
         },
         {
           date: '2024-01-19',
@@ -934,7 +934,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
           additions: 67,
           deletions: 89,
           sha: 'def456',
-          url: 'https://github.com/marcuschen/screenai/commit/def456'
+          url: 'https://github.com/asahapde/screenai/commit/def456'
         }
       ],
       languageStats: {
@@ -1237,7 +1237,16 @@ function ResultsContent() {
   // Get candidate and job data
   const candidate = mockResumes.find(r => r.id === candidateId)
   const job = candidate ? mockJobs.find(j => j.id === candidate.jobId) : null
-  const analysis = candidate && job ? generateEnhancedAnalysisData(candidateId || undefined) : null
+  
+  // Generate analysis based on candidate ID
+  let analysis = null
+  if (candidate && job) {
+    if (candidateId === 'noor-ahamed-sadique') {
+      analysis = generateRedFlagAnalysisData()
+    } else {
+      analysis = generateEnhancedAnalysisData(candidateId || undefined)
+    }
+  }
 
   useEffect(() => {
     // Simulate loading

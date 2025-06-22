@@ -66,18 +66,22 @@ export async function POST(request: NextRequest) {
     let isAbdullahResume: boolean
     
     const lowerFileName = file.name.toLowerCase()
+    console.log(`Upload API - Processing file: "${file.name}" -> "${lowerFileName}"`)
     
-    if (lowerFileName.includes('alex_smith') || lowerFileName.includes('alex-smith') || lowerFileName.includes('alexsmith')) {
-      // Route to red flag analysis for Alex Smith
-      candidateId = 'red-flag-demo'
+    if (lowerFileName.includes('noor_ahamed_sadique') || lowerFileName.includes('noor-ahamed-sadique') || lowerFileName.includes('noorahamedsadique')) {
+      // Route to red flag analysis for Noor Ahamed Sadique
+      console.log('🔴 Upload API - Detected Noor Ahamed Sadique -> noor-ahamed-sadique')
+      candidateId = 'noor-ahamed-sadique'
       isAbdullahResume = false
-    } else if (lowerFileName.includes('marcus_chen') || lowerFileName.includes('marcus-chen') || lowerFileName.includes('marcuschen')) {
-      // Route to enhanced/good analysis for Marcus Chen
-      candidateId = 'enhanced-demo'
+    } else if (lowerFileName.includes('abdullah_sahapdeen') || lowerFileName.includes('abdullah-sahapdeen') || lowerFileName.includes('abdullahsahapdeen')) {
+      // Route to enhanced/good analysis for Abdullah Sahapdeen
+      console.log('🟢 Upload API - Detected Abdullah Sahapdeen -> abdullah-sahapdeen')
+      candidateId = 'abdullah-sahapdeen'
       isAbdullahResume = true
     } else {
       // Default to enhanced analysis
-      candidateId = 'enhanced-demo'
+      console.log('⚠️ Upload API - No specific candidate detected, defaulting to abdullah-sahapdeen')
+      candidateId = 'abdullah-sahapdeen'
       isAbdullahResume = true
     }
     
