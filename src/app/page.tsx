@@ -52,11 +52,11 @@ export default function Home() {
             
             <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
               <span className="bg-gradient-to-r from-gray-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent">
-                Screen Smarter.
+                Resumes Lie.
               </span>
               <br />
               <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Hire Faster.
+                ScreenAI doesn't.
               </span>
             </h1>
             
