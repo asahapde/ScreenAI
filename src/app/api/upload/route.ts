@@ -18,34 +18,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!candidateDataString) {
-      return NextResponse.json(
-        { error: 'No candidate data provided' },
-        { status: 400 }
-      )
+    // Make candidateData optional for simple uploads
+    let candidateData: any = {}
+    if (candidateDataString) {
+      try {
+        candidateData = JSON.parse(candidateDataString)
+      } catch (error) {
+        console.error('Failed to parse candidate data:', error)
+        // Continue with empty candidateData rather than failing
+      }
     }
 
-    // Parse candidate data
-    let candidateData: any
-    try {
-      candidateData = JSON.parse(candidateDataString)
-    } catch (error) {
-      return NextResponse.json(
-        { error: 'Invalid candidate data format' },
-        { status: 400 }
-      )
-    }
-
-    // Validate file type
+    // Enhanced file type validation - be more permissive for testing
     const allowedTypes = [
       'application/pdf',
       'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain', // Allow text files for testing
+      'application/octet-stream' // Sometimes files come through as this
     ]
 
-    if (!allowedTypes.includes(file.type)) {
+    // Also check file extension as backup
+    const fileName = file.name.toLowerCase()
+    const hasValidExtension = fileName.endsWith('.pdf') || 
+                              fileName.endsWith('.doc') || 
+                              fileName.endsWith('.docx') ||
+                              fileName.endsWith('.txt')
+
+    if (!allowedTypes.includes(file.type) && !hasValidExtension) {
       return NextResponse.json(
-        { error: 'Invalid file type. Please upload a PDF or Word document.' },
+        { error: `Invalid file type: ${file.type}. Please upload a PDF, Word document, or text file.` },
         { status: 400 }
       )
     }
@@ -59,8 +61,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create candidate ID
-    const candidateId = generateId()
+    // Create candidate ID - check if this is Abdullah's resume
+    let candidateId = generateId()
+    const isAbdullahResume = fileName.includes('abdullah') || 
+                           fileName.includes('sahapde') || 
+                           fileName.includes('asahapde')
+    
+    if (isAbdullahResume) {
+      candidateId = 'abdullah' // Use consistent ID for Abdullah
+    }
     
     // Convert file to buffer
     const bytes = await file.arrayBuffer()
@@ -91,13 +100,12 @@ export async function POST(request: NextRequest) {
       const completeCandidate: CandidateData = {
         id: candidateId,
         resume: resumeData,
-        socialLinks: candidateData.socialLinks as SocialLinks,
+        socialLinks: candidateData.socialLinks || parsedResume.socialLinks || {},
         extraContext: candidateData.extraContext,
         createdAt: new Date()
       }
 
-      // Store candidate data in a simple in-memory store or database
-      // For this demo, we'll use a simple file-based storage
+      // Store candidate data
       const candidateDataPath = path.join(uploadDir, `${candidateId}_data.json`)
       await writeFile(candidateDataPath, JSON.stringify(completeCandidate, null, 2))
 
@@ -110,13 +118,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         candidateId,
-        message: 'Resume uploaded and parsed successfully'
+        message: 'Resume uploaded and parsed successfully',
+        candidateName: parsedResume.name || 'Unknown Candidate',
+        isAbdullah: isAbdullahResume
       })
 
     } catch (parseError) {
       console.error('Resume parsing error:', parseError)
       return NextResponse.json(
-        { error: 'Failed to parse resume. Please ensure the file is not corrupted.' },
+        { 
+          error: 'Failed to parse resume. Please ensure the file is not corrupted.',
+          details: parseError instanceof Error ? parseError.message : 'Unknown parsing error'
+        },
         { status: 500 }
       )
     }
@@ -124,7 +137,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }

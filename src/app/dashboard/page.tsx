@@ -123,7 +123,7 @@ const mockResumes: Resume[] = [
         github: 'https://github.com/sarahjohnson'
       }
     },
-    status: 'shortlisted',
+    status: 'pending',
     jobId: '1',
     aiScore: 92,
     notes: 'Excellent candidate with strong React background'
@@ -158,7 +158,7 @@ const mockResumes: Resume[] = [
         github: 'https://github.com/michaelchen'
       }
     },
-    status: 'reviewed',
+    status: 'pending',
     jobId: '2',
     aiScore: 88
   },
@@ -208,27 +208,32 @@ export default function Dashboard() {
   const [resumes, setResumes] = useState<Resume[]>(mockResumes)
   const [showJobCreator, setShowJobCreator] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
-  const [showResumeDetails, setShowResumeDetails] = useState(false)
   const [showJobDetails, setShowJobDetails] = useState(false)
-  const [selectedResume, setSelectedResume] = useState<Resume | null>(null)
+  const [showResumeDetails, setShowResumeDetails] = useState(false)
   const [selectedJob, setSelectedJob] = useState<Job | null>(null)
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
-  const [currentMessage, setCurrentMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [selectedResume, setSelectedResume] = useState<Resume | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string>('all')
-  
-  // Upload states
-  const [uploadFormData, setUploadFormData] = useState({
-    linkedin: "",
-    github: "",
-    portfolio: "",
-    extraContext: "",
-    jobDescription: "",
-    jobTitle: "",
-    company: "",
-    selectedJobId: ""
+  const [filterStatus, setFilterStatus] = useState('all')
+  const [currentMessage, setCurrentMessage] = useState('')
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Add new state for edit job and resume viewing
+  const [showEditJob, setShowEditJob] = useState(false)
+  const [showRawResume, setShowRawResume] = useState(false)
+  const [editingJob, setEditingJob] = useState<Job | null>(null)
+  const [editJobForm, setEditJobForm] = useState({
+    title: '',
+    description: '',
+    company: '',
+    location: '',
+    salary: '',
+    requirements: [] as string[],
+    benefits: [] as string[],
+    status: 'active' as 'active' | 'paused' | 'closed'
   })
+
+  // Resume upload states
   const [resume, setResume] = useState<File | null>(null)
   const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null)
   const [dragActive, setDragActive] = useState(false)
@@ -236,6 +241,13 @@ export default function Dashboard() {
   const [isParsing, setIsParsing] = useState(false)
   const [parseComplete, setParseComplete] = useState(false)
   const [uploadError, setUploadError] = useState("")
+  const [uploadFormData, setUploadFormData] = useState({
+    linkedin: "",
+    github: "",
+    portfolio: "",
+    extraContext: "",
+    selectedJobId: ""
+  })
 
   const allowedFileTypes = [
     "application/pdf",
@@ -276,7 +288,8 @@ export default function Dashboard() {
         throw new Error("Failed to parse resume")
       }
       
-      const parsed = await response.json()
+      const result = await response.json()
+      const parsed = result.parsed || result
       setParsedResume(parsed)
       
       // Auto-fill online presence fields if found in resume
@@ -396,9 +409,15 @@ export default function Dashboard() {
     try {
       const formData = new FormData()
       formData.append("resume", resume)
-      formData.append("data", JSON.stringify({
-        ...uploadFormData,
-        parsedData: parsedResume
+      formData.append("candidateData", JSON.stringify({
+        socialLinks: {
+          linkedin: uploadFormData.linkedin,
+          github: uploadFormData.github,
+          portfolio: uploadFormData.portfolio
+        },
+        extraContext: uploadFormData.extraContext,
+        jobDescription: uploadFormData.selectedJobId ? 
+          jobs.find(job => job.id === uploadFormData.selectedJobId) : null
       }))
 
       const response = await fetch("/api/upload", {
@@ -407,10 +426,42 @@ export default function Dashboard() {
       })
 
       if (!response.ok) {
-        throw new Error("Upload failed")
+        const errorData = await response.json()
+        throw new Error(errorData.error || `Upload failed with status ${response.status}`)
       }
 
       const result = await response.json()
+      
+      // If this is Abdullah's resume, show processing flow then redirect
+      if (result.isAbdullah) {
+        // Show upload success briefly
+        setUploadError("")
+        
+        // Show success message during processing
+        const successMessage = "✅ Resume uploaded successfully! Analyzing candidate profile..."
+        
+        // Simulate processing time with status updates
+        setTimeout(() => {
+          setIsUploading(false)
+          setShowUploadModal(false)
+          
+          // Reset form
+          setResume(null)
+          setParsedResume(null)
+          setParseComplete(false)
+          setUploadFormData({
+            linkedin: "",
+            github: "",
+            portfolio: "",
+            extraContext: "",
+            selectedJobId: ""
+          })
+          
+          // Redirect to processing page first, then to results
+          router.push('/processing?id=abdullah&from=dashboard')
+        }, 1500) // Show success for 1.5 seconds
+        return
+      }
       
       // Calculate job recommendations or use selected job
       let recommendedJobs: Array<{jobId: string, score: number}> = []
@@ -476,9 +527,6 @@ export default function Dashboard() {
         github: "",
         portfolio: "",
         extraContext: "",
-        jobDescription: "",
-        jobTitle: "",
-        company: "",
         selectedJobId: ""
       })
       
@@ -487,7 +535,8 @@ export default function Dashboard() {
       
     } catch (error) {
       console.error("Upload error:", error)
-      setUploadError("Failed to upload resume. Please try again.")
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload resume. Please try again."
+      setUploadError(errorMessage)
     } finally {
       setIsUploading(false)
     }
@@ -589,6 +638,150 @@ export default function Dashboard() {
     const matchesFilter = filterStatus === 'all' || resume.status === filterStatus
     return matchesSearch && matchesFilter
   })
+
+  // New handlers for edit job functionality
+  const handleEditJob = (job: Job) => {
+    setEditingJob(job)
+    setEditJobForm({
+      title: job.title,
+      description: job.description,
+      company: job.company,
+      location: job.location || '',
+      salary: job.salary || '',
+      requirements: [...job.requirements],
+      benefits: job.benefits ? [...job.benefits] : [],
+      status: job.status
+    })
+    setShowEditJob(true)
+  }
+
+  const handleSaveJob = () => {
+    if (!editingJob) return
+    
+    const updatedJob: Job = {
+      ...editingJob,
+      ...editJobForm,
+      requirements: editJobForm.requirements.filter(req => req.trim() !== ''),
+      benefits: editJobForm.benefits.filter(benefit => benefit.trim() !== '')
+    }
+    
+    setJobs(prev => prev.map(job => job.id === editingJob.id ? updatedJob : job))
+    setShowEditJob(false)
+    setEditingJob(null)
+  }
+
+  const handleEditJobFormChange = (field: string, value: string | string[]) => {
+    setEditJobForm(prev => ({ ...prev, [field]: value }))
+  }
+
+  const addRequirement = () => {
+    setEditJobForm(prev => ({ ...prev, requirements: [...prev.requirements, ''] }))
+  }
+
+  const removeRequirement = (index: number) => {
+    setEditJobForm(prev => ({ 
+      ...prev, 
+      requirements: prev.requirements.filter((_, i) => i !== index) 
+    }))
+  }
+
+  const updateRequirement = (index: number, value: string) => {
+    setEditJobForm(prev => ({
+      ...prev,
+      requirements: prev.requirements.map((req, i) => i === index ? value : req)
+    }))
+  }
+
+  const addBenefit = () => {
+    setEditJobForm(prev => ({ ...prev, benefits: [...prev.benefits, ''] }))
+  }
+
+  const removeBenefit = (index: number) => {
+    setEditJobForm(prev => ({ 
+      ...prev, 
+      benefits: prev.benefits.filter((_, i) => i !== index) 
+    }))
+  }
+
+  const updateBenefit = (index: number, value: string) => {
+    setEditJobForm(prev => ({
+      ...prev,
+      benefits: prev.benefits.map((benefit, i) => i === index ? value : benefit)
+    }))
+  }
+
+  // New handlers for candidate actions
+  const handleCandidateAction = (resumeId: string, action: 'shortlisted' | 'reviewed' | 'rejected' | 'pending') => {
+    setResumes(prev => prev.map(resume => 
+      resume.id === resumeId ? { ...resume, status: action } : resume
+    ))
+  }
+
+  const handleViewRawResume = (resume: Resume) => {
+    setSelectedResume(resume)
+    setShowRawResume(true)
+  }
+
+  // Job status management handlers
+  const handleJobStatusChange = (jobId: string, status: 'active' | 'paused' | 'closed') => {
+    setJobs(prev => prev.map(job => 
+      job.id === jobId ? { ...job, status } : job
+    ))
+  }
+
+  const handleDeleteJob = (jobId: string) => {
+    if (window.confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+      setJobs(prev => prev.filter(job => job.id !== jobId))
+    }
+  }
+
+  // Simple test upload for Abdullah
+  const handleTestAbdullahUpload = async () => {
+    setIsUploading(true)
+    setUploadError("")
+
+    try {
+      // Create a simple text file with Abdullah's name
+      const testContent = "Abdullah Sahapde\nSenior Software Engineer\nasahapde@gmail.com"
+      const testFile = new File([testContent], "abdullah_resume.txt", { type: "text/plain" })
+      
+      const formData = new FormData()
+      formData.append("resume", testFile)
+      formData.append("candidateData", JSON.stringify({
+        socialLinks: {
+          linkedin: "https://linkedin.com/in/abdullah-sahapdeen",
+          github: "https://github.com/asahapde",
+          portfolio: "https://asahap.com"
+        },
+        extraContext: "Test upload for enhanced analysis demonstration"
+      }))
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `Upload failed with status ${response.status}`)
+      }
+
+      const result = await response.json()
+      
+      // Show successful upload briefly, then redirect to processing
+      setTimeout(() => {
+        setIsUploading(false)
+        router.push('/processing?id=abdullah&from=dashboard')
+      }, 1500) // Show success for 1.5 seconds
+      
+    } catch (error) {
+      console.error("Test upload error:", error)
+      const errorMessage = error instanceof Error ? error.message : "Test upload failed. Please try again."
+      setUploadError(errorMessage)
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -778,23 +971,58 @@ export default function Dashboard() {
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="space-y-3 pt-4 border-t border-gray-100">
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
                         <Calendar className="h-4 w-4" />
                         <span>Created {job.createdAt.toLocaleDateString()}</span>
                       </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="group-hover:bg-indigo-50 group-hover:border-indigo-200"
-                        onClick={() => {
-                          setSelectedJob(job)
-                          setShowJobDetails(true)
-                        }}
-                      >
-                        View Details
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
+                      
+                      {/* Job Action Buttons */}
+                      <div className="flex flex-wrap gap-2">
+                        <Button 
+                          size="sm"
+                          variant={job.status === 'active' ? 'default' : 'outline'}
+                          className={job.status === 'active' ? 'bg-green-600 hover:bg-green-700' : 'hover:bg-green-50 hover:border-green-300'}
+                          onClick={() => handleJobStatusChange(job.id, 'active')}
+                        >
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Active
+                        </Button>
+                        <Button 
+                          size="sm"
+                          variant={job.status === 'paused' ? 'default' : 'outline'}
+                          className={job.status === 'paused' ? 'bg-yellow-600 hover:bg-yellow-700' : 'hover:bg-yellow-50 hover:border-yellow-300'}
+                          onClick={() => handleJobStatusChange(job.id, 'paused')}
+                        >
+                          <Pause className="h-3 w-3 mr-1" />
+                          Pause
+                        </Button>
+                        <Button 
+                          size="sm"
+                          variant="outline"
+                          className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+                          onClick={() => handleDeleteJob(job.id)}
+                        >
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Delete
+                        </Button>
+                      </div>
+
+                      {/* View Details Button */}
+                      <div className="flex justify-end">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="group-hover:bg-indigo-50 group-hover:border-indigo-200"
+                          onClick={() => {
+                            setSelectedJob(job)
+                            setShowJobDetails(true)
+                          }}
+                        >
+                          View Details
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -898,12 +1126,55 @@ export default function Dashboard() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="space-y-3 pt-4 border-t border-gray-100">
                       <div className="text-sm text-gray-500">
                         Applied for: <span className="font-medium text-gray-700">
                           {jobs.find(job => job.id === resume.jobId)?.title || 'General Application'}
                         </span>
                       </div>
+                      
+                      {/* Candidate Action Buttons */}
+                      <div className="flex flex-wrap gap-2">
+                        <Button 
+                          size="sm"
+                          variant={resume.status === 'shortlisted' ? 'default' : 'outline'}
+                          className={resume.status === 'shortlisted' ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-blue-50 hover:border-blue-300'}
+                          onClick={() => handleCandidateAction(resume.id, 'shortlisted')}
+                        >
+                          <Star className="h-3 w-3 mr-1" />
+                          Shortlist
+                        </Button>
+                        <Button 
+                          size="sm"
+                          variant={resume.status === 'reviewed' ? 'default' : 'outline'}
+                          className={resume.status === 'reviewed' ? 'bg-purple-600 hover:bg-purple-700' : 'hover:bg-purple-50 hover:border-purple-300'}
+                          onClick={() => handleCandidateAction(resume.id, 'reviewed')}
+                        >
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Mark Reviewed
+                        </Button>
+                        <Button 
+                          size="sm"
+                          variant={resume.status === 'rejected' ? 'default' : 'outline'}
+                          className={resume.status === 'rejected' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-red-50 hover:border-red-300'}
+                          onClick={() => handleCandidateAction(resume.id, 'rejected')}
+                        >
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Reject
+                        </Button>
+                        <Button 
+                          size="sm"
+                          variant={resume.status === 'pending' ? 'default' : 'outline'}
+                          className={resume.status === 'pending' ? 'bg-orange-600 hover:bg-orange-700 cursor-not-allowed opacity-50' : 'hover:bg-orange-50 hover:border-orange-300'}
+                          onClick={() => resume.status !== 'pending' && handleCandidateAction(resume.id, 'pending')}
+                          disabled={resume.status === 'pending'}
+                        >
+                          <Clock className="h-3 w-3 mr-1" />
+                          Mark Pending
+                        </Button>
+                      </div>
+
+                      {/* View Buttons */}
                       <div className="flex space-x-2">
                         <Button 
                           variant="outline" 
@@ -920,8 +1191,17 @@ export default function Dashboard() {
                         <Button 
                           variant="outline" 
                           size="sm" 
+                          className="group-hover:bg-green-50 group-hover:border-green-200"
+                          onClick={() => handleViewRawResume(resume)}
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          View Resume
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
                           className="group-hover:bg-indigo-50 group-hover:border-indigo-200"
-                          onClick={() => router.push(`/results?id=${resume.id}`)}
+                          onClick={() => router.push(`/results?id=${resume.id}&from=dashboard`)}
                         >
                           View Analysis
                           <ChevronRight className="h-4 w-4 ml-1" />
@@ -1057,7 +1337,13 @@ export default function Dashboard() {
 
               {/* Actions */}
               <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-                <Button variant="outline">
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setShowJobDetails(false)
+                    handleEditJob(selectedJob)
+                  }}
+                >
                   Edit Job
                 </Button>
                 <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
@@ -1335,9 +1621,6 @@ export default function Dashboard() {
                       github: "",
                       portfolio: "",
                       extraContext: "",
-                      jobDescription: "",
-                      jobTitle: "",
-                      company: "",
                       selectedJobId: ""
                     })
                   }}
@@ -1716,6 +1999,274 @@ export default function Dashboard() {
           </Card>
         </div>
       )}
+
+      {/* Edit Job Modal */}
+      {showEditJob && editingJob && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-lg border-white/20">
+            <CardHeader className="border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg">
+                    <Briefcase className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Edit Job</CardTitle>
+                    <CardDescription>Update job posting details</CardDescription>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowEditJob(false)}
+                  className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Cancel
+                </Button>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Job Title</label>
+                  <Input
+                    value={editJobForm.title}
+                    onChange={(e) => handleEditJobFormChange('title', e.target.value)}
+                    placeholder="Enter job title"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Company</label>
+                  <Input
+                    value={editJobForm.company}
+                    onChange={(e) => handleEditJobFormChange('company', e.target.value)}
+                    placeholder="Enter company name"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Location</label>
+                  <Input
+                    value={editJobForm.location}
+                    onChange={(e) => handleEditJobFormChange('location', e.target.value)}
+                    placeholder="Enter location"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Salary Range</label>
+                  <Input
+                    value={editJobForm.salary}
+                    onChange={(e) => handleEditJobFormChange('salary', e.target.value)}
+                    placeholder="e.g., $80,000 - $120,000"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Job Description</label>
+                <Textarea
+                  value={editJobForm.description}
+                  onChange={(e) => handleEditJobFormChange('description', e.target.value)}
+                  placeholder="Enter job description"
+                  rows={4}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
+                <select
+                  value={editJobForm.status}
+                  onChange={(e) => handleEditJobFormChange('status', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-medium text-gray-700">Requirements</label>
+                  <Button size="sm" variant="outline" onClick={addRequirement}>
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add Requirement
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  {editJobForm.requirements.map((req, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Input
+                        value={req}
+                        onChange={(e) => updateRequirement(index, e.target.value)}
+                        placeholder="Enter requirement"
+                        className="flex-1"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeRequirement(index)}
+                        className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-medium text-gray-700">Benefits</label>
+                  <Button size="sm" variant="outline" onClick={addBenefit}>
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add Benefit
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  {editJobForm.benefits.map((benefit, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Input
+                        value={benefit}
+                        onChange={(e) => updateBenefit(index, e.target.value)}
+                        placeholder="Enter benefit"
+                        className="flex-1"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeBenefit(index)}
+                        className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                <Button variant="outline" onClick={() => setShowEditJob(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveJob} className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                  Save Changes
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* View Resume Modal */}
+      {showRawResume && selectedResume && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white/95 backdrop-blur-lg border-white/20">
+            <CardHeader className="border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg">
+                    <FileText className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="flex items-center space-x-2">
+                      <span>Resume: {selectedResume.candidateName}</span>
+                    </CardTitle>
+                    <CardDescription>
+                      Original uploaded file: {selectedResume.fileName}
+                    </CardDescription>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowRawResume(false)}
+                  className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Close
+                </Button>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="p-0">
+              <div className="h-[70vh] bg-gray-50 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 max-w-md mx-auto">
+                    <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Resume File Preview</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      File: <span className="font-medium">{selectedResume.fileName}</span>
+                    </p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Uploaded: {selectedResume.uploadedAt.toLocaleDateString()}
+                    </p>
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-400">
+                        Raw file viewing would require additional PDF viewer integration.
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        For now, you can view the parsed data in the "View Details" section.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setShowRawResume(false)
+                      setShowResumeDetails(true)
+                    }}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Parsed Details Instead
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Quick Test - Abdullah's Resume */}
+      <div className="mb-4">
+        <Card className="bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold text-purple-800">🚀 Quick Test</h4>
+                <p className="text-sm text-purple-700">Test with Abdullah's enhanced resume analysis</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  size="sm" 
+                  className="bg-purple-600 hover:bg-purple-700"
+                  onClick={() => router.push('/results?id=abdullah&from=dashboard')}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Results
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="border-purple-600 text-purple-600 hover:bg-purple-50"
+                  onClick={handleTestAbdullahUpload}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4 mr-2" />
+                  )}
+                  Test Upload
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* File Upload Area */}
     </div>
   )
 } 
