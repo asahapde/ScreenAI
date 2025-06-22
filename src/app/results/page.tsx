@@ -43,7 +43,12 @@ import {
   Sparkles,
   Users,
   MessageSquare,
-  Heart
+  Heart,
+  XCircle,
+  Bot,
+  HelpCircle,
+  Ban,
+  Lightbulb
 } from "lucide-react"
 import { Resume, Job } from "@/types"
 import { GitHubAnalysis } from "@/components/analysis/github-analysis"
@@ -107,6 +112,71 @@ const mockResumes: Resume[] = [
     jobId: '1',
     aiScore: 96,
     notes: 'Outstanding candidate with exceptional GitHub portfolio and strong technical leadership experience'
+  },
+  {
+    id: 'john-fake',
+    candidateName: 'John Thompson',
+    email: 'john.thompson@email.com',
+    phone: '+1 (555) 987-6543',
+    uploadedAt: new Date('2024-01-18'),
+    fileName: 'john_thompson_resume.pdf',
+    parsedData: {
+      name: 'John Thompson',
+      email: 'john.thompson@email.com',
+      phone: '+1 (555) 987-6543',
+      summary: 'Senior Full-Stack Engineer with 8+ years of experience building scalable applications at Fortune 500 companies. Expert in React, Node.js, and cloud architecture.',
+      experience: [
+        {
+          company: 'Google',
+          position: 'Senior Software Engineer',
+          duration: '2020-2024',
+          description: 'Led development of critical infrastructure serving 2 billion users. Built and maintained microservices architecture.',
+          technologies: ['React', 'Node.js', 'Kubernetes', 'Go', 'Python', 'GCP']
+        },
+        {
+          company: 'Facebook',
+          position: 'Software Engineer',
+          duration: '2018-2020',
+          description: 'Developed user-facing features for Facebook Marketplace. Optimized performance for millions of daily users.',
+          technologies: ['React', 'PHP', 'Hack', 'GraphQL', 'MySQL']
+        },
+        {
+          company: 'Amazon',
+          position: 'Software Developer',
+          duration: '2016-2018',
+          description: 'Built AWS Lambda functions and managed cloud infrastructure. Implemented CI/CD pipelines.',
+          technologies: ['Java', 'AWS', 'Lambda', 'DynamoDB', 'CloudFormation']
+        }
+      ],
+      education: [
+        {
+          institution: 'Stanford University',
+          degree: 'Master of Science in Computer Science',
+          duration: '2014-2016',
+          gpa: '3.9'
+        },
+        {
+          institution: 'MIT',
+          degree: 'Bachelor of Science in Computer Science',
+          duration: '2010-2014',
+          gpa: '3.8'
+        }
+      ],
+      skills: [
+        'React', 'Node.js', 'Python', 'Go', 'Java', 'Kubernetes', 'Docker',
+        'AWS', 'GCP', 'GraphQL', 'REST APIs', 'MongoDB', 'PostgreSQL',
+        'Redis', 'Machine Learning', 'TensorFlow', 'DevOps', 'CI/CD'
+      ],
+      socialLinks: {
+        linkedin: 'https://linkedin.com/in/john-thompson-dev',
+        github: 'https://github.com/johnthompson',
+        portfolio: 'https://johnthompson.dev'
+      }
+    },
+    status: 'pending',
+    jobId: '1',
+    aiScore: 23,
+    notes: 'MAJOR RED FLAGS - Multiple inconsistencies detected. Do not proceed with hiring.'
   }
 ]
 
@@ -126,8 +196,311 @@ const mockJobs: Job[] = [
   }
 ]
 
+// Red flag candidate analysis data
+const generateJohnFakeAnalysisData = () => {
+  return {
+    overallScore: 23,
+    matchPercentage: 15,
+    
+    // GitHub Analysis Data - RED FLAGS
+    githubData: {
+      profile: {
+        name: 'John Thompson',
+        bio: 'Senior Full-Stack Engineer at Google',
+        company: 'Google',
+        location: 'Mountain View, CA',
+        followers: 12,
+        following: 234,
+        publicRepos: 3,
+        totalStars: 4,
+        totalForks: 1,
+        contributions: 23
+      },
+      projects: [
+        {
+          name: 'hello-world',
+          description: 'My first repository',
+          language: 'JavaScript',
+          stars: 2,
+          forks: 0,
+          commits: 3,
+          lastUpdated: '2 years ago',
+          technologies: ['JavaScript'],
+          codeQuality: 12,
+          resumeClaim: 'Led development of critical infrastructure serving 2 billion users',
+          verification: 'disputed' as const,
+          url: 'https://github.com/johnthompson/hello-world'
+        },
+        {
+          name: 'copied-tutorial',
+          description: 'React tutorial copy',
+          language: 'JavaScript',
+          stars: 1,
+          forks: 1,
+          commits: 1,
+          lastUpdated: '1 year ago',
+          technologies: ['React'],
+          codeQuality: 8,
+          resumeClaim: 'Built and maintained microservices architecture',
+          verification: 'disputed' as const,
+          url: 'https://github.com/johnthompson/copied-tutorial'
+        }
+      ],
+      commits: [
+        {
+          date: '2023-03-15',
+          message: 'Initial commit',
+          additions: 1200,
+          deletions: 0,
+          sha: 'xyz789',
+          url: 'https://github.com/johnthompson/hello-world/commit/xyz789'
+        }
+      ],
+      languageStats: {
+        'JavaScript': 95,
+        'HTML': 5
+      },
+      activityPattern: {
+        weeklyCommits: [0, 0, 0, 1, 0, 0, 0],
+        hourlyPattern: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        streakDays: 0,
+        mostActiveMonth: 'March 2023'
+      },
+      codeVerification: {
+        resumeSkills: ['React', 'Node.js', 'Kubernetes', 'Go', 'Python', 'GCP'],
+        verifiedSkills: ['JavaScript'],
+        disputedClaims: [
+          {
+            claim: 'Led development of critical infrastructure serving 2 billion users',
+            reality: 'Only has 3 trivial repositories with minimal commits. No evidence of enterprise-level work.',
+            confidence: 98
+          },
+          {
+            claim: 'Expert in React, Node.js, and cloud architecture',
+            reality: 'GitHub shows only basic JavaScript. No Node.js, cloud, or advanced React code found.',
+            confidence: 96
+          },
+          {
+            claim: 'Built and maintained microservices architecture',
+            reality: 'No evidence of microservices, Docker, or Kubernetes usage in any repositories.',
+            confidence: 99
+          }
+        ]
+      },
+      aiGeneratedCodeDetection: {
+        overallAIScore: 87,
+        analysisResults: [
+          {
+            file: 'hello-world/index.js',
+            aiProbability: 94,
+            indicators: ['Generic variable names', 'ChatGPT-style comments', 'Perfect formatting with no personal style'],
+            vibeCheck: 'EXTREMELY_SUSPICIOUS'
+          },
+          {
+            file: 'copied-tutorial/App.js',
+            aiProbability: 89,
+            indicators: ['Identical to React tutorial', 'No personal modifications', 'Copy-paste detection positive'],
+            vibeCheck: 'COPY_PASTE'
+          }
+        ],
+        codePattern: 'AI_GENERATED_WITH_MINIMAL_MODIFICATION'
+      }
+    },
+
+    // Culture Fit Data - POOR FIT
+    cultureFitData: {
+      overallFitScore: 18,
+      values: [
+        {
+          name: 'Honesty & Integrity',
+          candidateScore: 5,
+          companyScore: 95,
+          match: 5,
+          description: 'Major inconsistencies between resume claims and actual evidence'
+        },
+        {
+          name: 'Technical Excellence',
+          candidateScore: 15,
+          companyScore: 90,
+          match: 17,
+          description: 'Minimal technical evidence despite grandiose claims'
+        },
+        {
+          name: 'Growth Mindset',
+          candidateScore: 25,
+          companyScore: 85,
+          match: 29,
+          description: 'No evidence of continuous learning or skill development'
+        }
+      ],
+      teamDynamics: {
+        leadershipStyle: 'Unverified Claims',
+        collaborationScore: 12,
+        independenceScore: 20,
+        mentorshipInterest: 5
+      },
+      growthMindset: {
+        learningAgility: 15,
+        adaptability: 18,
+        innovationDrive: 12
+      },
+      companyAlignment: {
+        missionAlignment: 22,
+        industryPassion: 14
+      }
+    },
+
+    // OA Assessment Data - FULL OA REQUIRED + CONCERNS
+    oaData: {
+      overallOARecommendation: 'full' as const,
+      confidenceScore: 97,
+      skillsAssessment: [
+        {
+          skill: 'Data Structures & Algorithms',
+          required: true,
+          githubEvidence: ['No algorithmic code found', 'Only basic hello-world scripts'],
+          proficiencyLevel: 8,
+          oaRequired: true,
+          reasoning: 'No evidence of algorithmic thinking. Likely lacks fundamental CS knowledge.'
+        },
+        {
+          skill: 'System Design',
+          required: true,
+          githubEvidence: ['No architecture evidence', 'No complex systems', 'Trivial single-file projects'],
+          proficiencyLevel: 5,
+          oaRequired: true,
+          reasoning: 'Claims enterprise architecture experience but shows no supporting evidence.'
+        }
+      ],
+      algorithmicThinking: {
+        score: 8,
+        evidence: ['No algorithmic code', 'Basic scripting only'],
+        oaNeeded: true
+      },
+      problemSolving: {
+        score: 12,
+        evidence: ['No complex problem solving', 'Copy-paste solutions'],
+        oaNeeded: true
+      },
+      codeQuality: {
+        score: 15,
+        evidence: ['Poor code structure', 'No testing', 'Minimal documentation'],
+        oaNeeded: true
+      },
+      domainExpertise: {
+        score: 6,
+        evidence: ['Claims not supported by code', 'Fundamental mismatches'],
+        oaNeeded: true
+      },
+      summary: 'RECOMMENDATION: DO NOT HIRE. This candidate shows severe misrepresentation of skills and experience. GitHub portfolio contradicts all major resume claims. High probability of fraudulent application.',
+      recommendations: [
+        'REJECT immediately - major red flags detected',
+        'Do not proceed with any form of interview',
+        'Consider flagging profile for potential fraud'
+      ]
+    },
+
+    // Blog Analysis Data - MINIMAL/FAKE
+    blogData: {
+      overallScore: 8,
+      thoughtLeadershipScore: 5,
+      technicalWritingScore: 12,
+      consistencyScore: 3,
+      totalPosts: 2,
+      totalViews: 45,
+      totalEngagement: 3,
+      platforms: ['Medium'],
+      topTopics: [
+        { topic: 'Hello World', count: 1 },
+        { topic: 'Getting Started', count: 1 }
+      ],
+      posts: [
+        {
+          title: 'My Journey into Programming',
+          url: 'https://medium.com/@johnthompson/my-journey',
+          platform: 'Medium',
+          publishedDate: '2023-02-15',
+          readTime: 2,
+          views: 23,
+          likes: 2,
+          comments: 0,
+          topics: ['Beginner', 'Programming'],
+          relevanceScore: 8,
+          qualityScore: 12,
+          summary: 'Basic introduction post with no technical depth'
+        }
+      ],
+      writingAnalysis: {
+        averageReadTime: 2,
+        averageQuality: 12,
+        averageRelevance: 8,
+        writingStyle: 'Elementary',
+        technicalDepth: 'Superficial'
+      },
+      careerImpact: {
+        thoughtLeadership: 5,
+        industryRecognition: 2,
+        knowledgeSharing: 8,
+        communityEngagement: 4
+      }
+    },
+
+    // Stack Overflow Data - INACTIVE/POOR
+    stackOverflowData: {
+      profile: {
+        reputation: 1,
+        badgeCount: 0,
+        goldBadges: 0,
+        silverBadges: 0,
+        bronzeBadges: 0,
+        questionsAsked: 2,
+        answersProvided: 0,
+        memberSince: '2023',
+        lastActive: '6 months ago'
+      },
+      expertise: {
+        topTags: [],
+        knowledgeAreas: [],
+        expertiseLevel: 2,
+        consistencyScore: 1
+      },
+      engagement: {
+        helpfulnessScore: 0,
+        communityContribution: 1,
+        mentorshipIndicator: 0,
+        problemSolvingScore: 3
+      },
+      recentActivity: [
+        {
+          id: 1,
+          type: 'question' as const,
+          title: 'How to print hello world in JavaScript?',
+          tags: ['javascript', 'beginner'],
+          score: -2,
+          views: 12,
+          answers: 3,
+          accepted: false,
+          createdDate: '2023-03-10',
+          summary: 'Basic question showing fundamental lack of programming knowledge'
+        }
+      ],
+      careerRelevance: {
+        jobRelevantTags: [],
+        domainExpertise: 1,
+        technicalDepth: 2,
+        practicalExperience: 3
+      }
+    }
+  }
+}
+
 // Enhanced mock data for comprehensive analysis
-const generateEnhancedAnalysisData = () => {
+const generateEnhancedAnalysisData = (candidateId?: string) => {
+  // Return red flag data for John Thompson
+  if (candidateId === 'john-fake') {
+    return generateJohnFakeAnalysisData()
+  }
+  
   return {
     overallScore: 96,
     matchPercentage: 92,
@@ -218,6 +591,24 @@ const generateEnhancedAnalysisData = () => {
             confidence: 78
           }
         ]
+      },
+      aiGeneratedCodeDetection: {
+        overallAIScore: 8,
+        analysisResults: [
+          {
+            file: 'ScreenAI/src/components/Analysis.tsx',
+            aiProbability: 12,
+            indicators: ['Natural coding style', 'Personal variable naming', 'Consistent architecture patterns'],
+            vibeCheck: 'AUTHENTIC'
+          },
+          {
+            file: 'microservices-ecommerce/backend/auth.js',
+            aiProbability: 5,
+            indicators: ['Complex business logic', 'Personal code comments', 'Iterative development history'],
+            vibeCheck: 'HUMAN_WRITTEN'
+          }
+        ],
+        codePattern: 'HUMAN_WRITTEN'
       }
     },
 
@@ -476,7 +867,7 @@ function ResultsContent() {
   // Get candidate and job data
   const candidate = mockResumes.find(r => r.id === candidateId)
   const job = candidate ? mockJobs.find(j => j.id === candidate.jobId) : null
-  const analysis = candidate && job ? generateEnhancedAnalysisData() : null
+  const analysis = candidate && job ? generateEnhancedAnalysisData(candidateId || undefined) : null
 
   useEffect(() => {
     // Simulate loading
@@ -753,86 +1144,297 @@ function ResultsContent() {
                 <div className="p-6">
                   <TabsContent value="overview" className="mt-0">
                     <div className="space-y-6">
-                      {/* Key Insights */}
+                      {/* Visual Score Dashboard */}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-indigo-100 text-sm font-medium">Overall Score</p>
+                                <p className="text-3xl font-bold">{analysis.overallScore}%</p>
+                              </div>
+                              <div className="p-2 bg-white/20 rounded-lg">
+                                <TrendingUp className="h-6 w-6" />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-green-100 text-sm font-medium">Role Match</p>
+                                <p className="text-3xl font-bold">{analysis.matchPercentage}%</p>
+                              </div>
+                              <div className="p-2 bg-white/20 rounded-lg">
+                                <Target className="h-6 w-6" />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-blue-100 text-sm font-medium">Culture Fit</p>
+                                <p className="text-3xl font-bold">{analysis.cultureFitData.overallFitScore}%</p>
+                              </div>
+                              <div className="p-2 bg-white/20 rounded-lg">
+                                <Users className="h-6 w-6" />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className={`border-0 text-white ${
+                          analysis.overallScore >= 80 ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
+                          analysis.overallScore >= 60 ? 'bg-gradient-to-r from-yellow-500 to-orange-600' :
+                          'bg-gradient-to-r from-red-500 to-pink-600'
+                        }`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-white/80 text-sm font-medium">Status</p>
+                                <p className="text-lg font-bold">
+                                  {analysis.overallScore >= 80 ? 'HIRE' :
+                                   analysis.overallScore >= 60 ? 'MAYBE' :
+                                   'REJECT'}
+                                </p>
+                              </div>
+                              <div className="p-2 bg-white/20 rounded-lg">
+                                {analysis.overallScore >= 80 ? <CheckCircle className="h-6 w-6" /> :
+                                 analysis.overallScore >= 60 ? <AlertCircle className="h-6 w-6" /> :
+                                 <XCircle className="h-6 w-6" />}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* AI Detection Alert */}
+                      {analysis.githubData?.aiGeneratedCodeDetection && (
+                        <Card className={`${
+                          analysis.githubData.aiGeneratedCodeDetection.overallAIScore > 50 
+                            ? 'bg-red-50 border-red-200' 
+                            : 'bg-green-50 border-green-200'
+                        }`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-3">
+                                <div className={`p-2 rounded-lg ${
+                                  analysis.githubData.aiGeneratedCodeDetection.overallAIScore > 50 
+                                    ? 'bg-red-100' 
+                                    : 'bg-green-100'
+                                }`}>
+                                  <Bot className={`h-5 w-5 ${
+                                    analysis.githubData.aiGeneratedCodeDetection.overallAIScore > 50 
+                                      ? 'text-red-600' 
+                                      : 'text-green-600'
+                                  }`} />
+                                </div>
+                                <div>
+                                  <h3 className={`font-semibold ${
+                                    analysis.githubData.aiGeneratedCodeDetection.overallAIScore > 50 
+                                      ? 'text-red-800' 
+                                      : 'text-green-800'
+                                  }`}>
+                                    AI Code Detection
+                                  </h3>
+                                  <p className={`text-sm ${
+                                    analysis.githubData.aiGeneratedCodeDetection.overallAIScore > 50 
+                                      ? 'text-red-700' 
+                                      : 'text-green-700'
+                                  }`}>
+                                    {analysis.githubData.aiGeneratedCodeDetection.overallAIScore > 50 
+                                      ? `⚠️ High AI probability detected (${analysis.githubData.aiGeneratedCodeDetection.overallAIScore}%)`
+                                      : `✅ Authentic human-written code (${100 - analysis.githubData.aiGeneratedCodeDetection.overallAIScore}% confidence)`}
+                                  </p>
+                                </div>
+                              </div>
+                              <Badge className={
+                                analysis.githubData.aiGeneratedCodeDetection.overallAIScore > 50 
+                                  ? 'bg-red-100 text-red-800' 
+                                  : 'bg-green-100 text-green-800'
+                              }>
+                                {analysis.githubData.aiGeneratedCodeDetection.codePattern || 'HUMAN_WRITTEN'}
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {/* Key Insights - Dynamic based on score */}
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <Card className="bg-green-50 border-green-200">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-center space-x-2">
-                              <CheckCircle className="h-5 w-5 text-green-600" />
-                              <CardTitle className="text-lg text-green-800">Strengths</CardTitle>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <ul className="space-y-2 text-sm">
-                              <li className="flex items-start space-x-2">
-                                <span className="text-green-600 mt-1">•</span>
-                                <span>Exceptional GitHub portfolio with 1,139 stars</span>
-                              </li>
-                              <li className="flex items-start space-x-2">
-                                <span className="text-green-600 mt-1">•</span>
-                                <span>Strong AI/ML expertise with real implementations</span>
-                              </li>
-                              <li className="flex items-start space-x-2">
-                                <span className="text-green-600 mt-1">•</span>
-                                <span>Proven scalable architecture experience</span>
-                              </li>
-                              <li className="flex items-start space-x-2">
-                                <span className="text-green-600 mt-1">•</span>
-                                <span>Active technical blogger and community member</span>
-                              </li>
-                            </ul>
-                          </CardContent>
-                        </Card>
+                        {analysis.overallScore >= 80 ? (
+                          <>
+                            <Card className="bg-green-50 border-green-200">
+                              <CardHeader className="pb-3">
+                                <div className="flex items-center space-x-2">
+                                  <CheckCircle className="h-5 w-5 text-green-600" />
+                                  <CardTitle className="text-lg text-green-800">✅ Verified Strengths</CardTitle>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <ul className="space-y-2 text-sm">
+                                  <li className="flex items-start space-x-2">
+                                    <Star className="h-4 w-4 text-green-600 mt-0.5" />
+                                    <span>Exceptional GitHub portfolio with {analysis.githubData?.profile.totalStars || 1139} stars</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <Code className="h-4 w-4 text-green-600 mt-0.5" />
+                                    <span>Strong AI/ML expertise with real implementations</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <Building2 className="h-4 w-4 text-green-600 mt-0.5" />
+                                    <span>Proven scalable architecture experience</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <BookOpen className="h-4 w-4 text-green-600 mt-0.5" />
+                                    <span>Active technical blogger and community member</span>
+                                  </li>
+                                </ul>
+                              </CardContent>
+                            </Card>
 
-                        <Card className="bg-yellow-50 border-yellow-200">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-center space-x-2">
-                              <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                              <CardTitle className="text-lg text-yellow-800">Areas to Explore</CardTitle>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <ul className="space-y-2 text-sm">
-                              <li className="flex items-start space-x-2">
-                                <span className="text-yellow-600 mt-1">•</span>
-                                <span>Verify Kubernetes expertise claims</span>
-                              </li>
-                              <li className="flex items-start space-x-2">
-                                <span className="text-yellow-600 mt-1">•</span>
-                                <span>Discuss team leadership experience</span>
-                              </li>
-                              <li className="flex items-start space-x-2">
-                                <span className="text-yellow-600 mt-1">•</span>
-                                <span>Explore salary expectations</span>
-                              </li>
-                            </ul>
-                          </CardContent>
-                        </Card>
+                            <Card className="bg-blue-50 border-blue-200">
+                              <CardHeader className="pb-3">
+                                <div className="flex items-center space-x-2">
+                                  <Lightbulb className="h-5 w-5 text-blue-600" />
+                                  <CardTitle className="text-lg text-blue-800">💡 Interview Focus</CardTitle>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <ul className="space-y-2 text-sm">
+                                  <li className="flex items-start space-x-2">
+                                    <MessageSquare className="h-4 w-4 text-blue-600 mt-0.5" />
+                                    <span>Discuss specific project architectures</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <Users className="h-4 w-4 text-blue-600 mt-0.5" />
+                                    <span>Explore team leadership experience</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <TrendingUp className="h-4 w-4 text-blue-600 mt-0.5" />
+                                    <span>Career growth motivations</span>
+                                  </li>
+                                </ul>
+                              </CardContent>
+                            </Card>
 
-                        <Card className="bg-blue-50 border-blue-200">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-center space-x-2">
-                              <Star className="h-5 w-5 text-blue-600" />
-                              <CardTitle className="text-lg text-blue-800">Recommendations</CardTitle>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <ul className="space-y-2 text-sm">
-                              <li className="flex items-start space-x-2">
-                                <span className="text-blue-600 mt-1">•</span>
-                                <span>Skip technical OA - GitHub proves competency</span>
-                              </li>
-                              <li className="flex items-start space-x-2">
-                                <span className="text-blue-600 mt-1">•</span>
-                                <span>Focus on culture fit and behavioral interview</span>
-                              </li>
-                              <li className="flex items-start space-x-2">
-                                <span className="text-blue-600 mt-1">•</span>
-                                <span>Discuss specific project architectures</span>
-                              </li>
-                            </ul>
-                          </CardContent>
-                        </Card>
+                            <Card className="bg-purple-50 border-purple-200">
+                              <CardHeader className="pb-3">
+                                <div className="flex items-center space-x-2">
+                                  <Zap className="h-5 w-5 text-purple-600" />
+                                  <CardTitle className="text-lg text-purple-800">🚀 Recommendations</CardTitle>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <ul className="space-y-2 text-sm">
+                                  <li className="flex items-start space-x-2">
+                                    <CheckCircle className="h-4 w-4 text-purple-600 mt-0.5" />
+                                    <span>Skip technical OA - GitHub proves competency</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <Calendar className="h-4 w-4 text-purple-600 mt-0.5" />
+                                    <span>Fast-track to senior interview round</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <DollarSign className="h-4 w-4 text-purple-600 mt-0.5" />
+                                    <span>Prepare competitive offer package</span>
+                                  </li>
+                                </ul>
+                              </CardContent>
+                            </Card>
+                          </>
+                        ) : (
+                          <>
+                            <Card className="bg-red-50 border-red-200">
+                              <CardHeader className="pb-3">
+                                <div className="flex items-center space-x-2">
+                                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                                  <CardTitle className="text-lg text-red-800">🚨 Major Red Flags</CardTitle>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <ul className="space-y-2 text-sm">
+                                  <li className="flex items-start space-x-2">
+                                    <XCircle className="h-4 w-4 text-red-600 mt-0.5" />
+                                    <span>Resume claims don't match GitHub evidence</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <XCircle className="h-4 w-4 text-red-600 mt-0.5" />
+                                    <span>Minimal technical contribution history</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <Bot className="h-4 w-4 text-red-600 mt-0.5" />
+                                    <span>Possible AI-generated code detected</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                    <Shield className="h-4 w-4 text-red-600 mt-0.5" />
+                                    <span>Fraudulent application suspected</span>
+                                  </li>
+                                </ul>
+                              </CardContent>
+                            </Card>
+
+                            <Card className="bg-orange-50 border-orange-200">
+                              <CardHeader className="pb-3">
+                                <div className="flex items-center space-x-2">
+                                  <MessageSquare className="h-5 w-5 text-orange-600" />
+                                  <CardTitle className="text-lg text-orange-800">❓ Interview Questions</CardTitle>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <ul className="space-y-2 text-sm">
+                                  {analysis.githubData?.codeVerification?.disputedClaims?.slice(0,3).map((claim, index) => (
+                                    <li key={index} className="flex items-start space-x-2">
+                                      <HelpCircle className="h-4 w-4 text-orange-600 mt-0.5" />
+                                      <span>"Can you walk me through your {claim.claim.toLowerCase()}?"</span>
+                                    </li>
+                                  )) || (
+                                    <>
+                                      <li className="flex items-start space-x-2">
+                                        <HelpCircle className="h-4 w-4 text-orange-600 mt-0.5" />
+                                        <span>"Explain your role in the enterprise projects mentioned"</span>
+                                      </li>
+                                      <li className="flex items-start space-x-2">
+                                        <HelpCircle className="h-4 w-4 text-orange-600 mt-0.5" />
+                                        <span>"Walk us through your microservices architecture"</span>
+                                      </li>
+                                    </>
+                                  )}
+                                </ul>
+                              </CardContent>
+                            </Card>
+
+                            <Card className="bg-gray-50 border-gray-200">
+                              <CardHeader className="pb-3">
+                                <div className="flex items-center space-x-2">
+                                  <Ban className="h-5 w-5 text-gray-600" />
+                                  <CardTitle className="text-lg text-gray-800">⛔ Actions</CardTitle>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="space-y-3">
+                                  <Button size="sm" className="w-full bg-red-600 hover:bg-red-700 text-white">
+                                    <XCircle className="h-4 w-4 mr-2" />
+                                    Reject Application
+                                  </Button>
+                                  <Button size="sm" variant="outline" className="w-full border-gray-400 text-gray-700">
+                                    <Shield className="h-4 w-4 mr-2" />
+                                    Flag for Fraud Review
+                                  </Button>
+                                  <Button size="sm" variant="outline" className="w-full border-gray-400 text-gray-700">
+                                    <Ban className="h-4 w-4 mr-2" />
+                                    Add to Blacklist
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </>
+                        )}
                       </div>
 
                       {/* Skills Match */}

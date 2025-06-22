@@ -411,11 +411,11 @@ export default function Dashboard() {
       formData.append("resume", resume)
       formData.append("candidateData", JSON.stringify({
         socialLinks: {
-          linkedin: uploadFormData.linkedin,
-          github: uploadFormData.github,
-          portfolio: uploadFormData.portfolio
+          linkedin: uploadFormData.linkedin || 'https://linkedin.com/in/abdullah-sahapdeen',
+          github: uploadFormData.github || 'https://github.com/asahapde',
+          portfolio: uploadFormData.portfolio || 'https://asahap.com'
         },
-        extraContext: uploadFormData.extraContext,
+        extraContext: uploadFormData.extraContext || 'Experienced Software Engineer with 5+ years of expertise in full-stack development, AI/ML integration, and scalable system architecture.',
         jobDescription: uploadFormData.selectedJobId ? 
           jobs.find(job => job.id === uploadFormData.selectedJobId) : null
       }))
@@ -735,53 +735,7 @@ export default function Dashboard() {
     }
   }
 
-  // Simple test upload for Abdullah
-  const handleTestAbdullahUpload = async () => {
-    setIsUploading(true)
-    setUploadError("")
 
-    try {
-      // Create a simple text file with Abdullah's name
-      const testContent = "Abdullah Sahapde\nSenior Software Engineer\nasahapde@gmail.com"
-      const testFile = new File([testContent], "abdullah_resume.txt", { type: "text/plain" })
-      
-      const formData = new FormData()
-      formData.append("resume", testFile)
-      formData.append("candidateData", JSON.stringify({
-        socialLinks: {
-          linkedin: "https://linkedin.com/in/abdullah-sahapdeen",
-          github: "https://github.com/asahapde",
-          portfolio: "https://asahap.com"
-        },
-        extraContext: "Test upload for enhanced analysis demonstration"
-      }))
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `Upload failed with status ${response.status}`)
-      }
-
-      const result = await response.json()
-      
-      // Show successful upload briefly, then redirect to processing
-      setTimeout(() => {
-        setIsUploading(false)
-        router.push('/processing?id=abdullah&from=dashboard')
-      }, 1500) // Show success for 1.5 seconds
-      
-    } catch (error) {
-      console.error("Test upload error:", error)
-      const errorMessage = error instanceof Error ? error.message : "Test upload failed. Please try again."
-      setUploadError(errorMessage)
-    } finally {
-      setIsUploading(false)
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -2228,43 +2182,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Quick Test - Abdullah's Resume */}
-      <div className="mb-4">
-        <Card className="bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-semibold text-purple-800">🚀 Quick Test</h4>
-                <p className="text-sm text-purple-700">Test with Abdullah's enhanced resume analysis</p>
-              </div>
-              <div className="flex space-x-2">
-                <Button 
-                  size="sm" 
-                  className="bg-purple-600 hover:bg-purple-700"
-                  onClick={() => router.push('/results?id=abdullah&from=dashboard')}
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Results
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  className="border-purple-600 text-purple-600 hover:bg-purple-50"
-                  onClick={handleTestAbdullahUpload}
-                  disabled={isUploading}
-                >
-                  {isUploading ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4 mr-2" />
-                  )}
-                  Test Upload
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+
 
       {/* File Upload Area */}
     </div>
