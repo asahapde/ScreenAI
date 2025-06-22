@@ -690,8 +690,8 @@ export default function Dashboard() {
       company: job.company,
       location: job.location || '',
       salary: job.salary || '',
-      requirements: [...job.requirements],
-      benefits: job.benefits ? [...job.benefits] : [],
+      requirements: job.requirements.map(req => renderRequirement(req)),
+      benefits: job.benefits ? job.benefits.map(benefit => renderBenefit(benefit)) : [],
       status: job.status
     })
     setShowEditJob(true)
@@ -787,6 +787,41 @@ export default function Dashboard() {
     } catch {
       return 'Invalid Date'
     }
+  }
+
+  // Helper function to safely render requirements (handles both strings and objects)
+  const renderRequirement = (req: any): string => {
+    if (typeof req === 'string') return req
+    if (typeof req === 'object' && req !== null) {
+      // Handle {title, description} format
+      if (req.title && req.description) {
+        return `${req.title}: ${req.description}`
+      }
+      // Handle other object formats
+      if (req.skill) return req.skill
+      if (req.name) return req.name
+      if (req.title) return req.title
+      if (req.description) return req.description
+      return JSON.stringify(req)
+    }
+    return String(req)
+  }
+
+  // Helper function to safely render benefits (handles both strings and objects)
+  const renderBenefit = (benefit: any): string => {
+    if (typeof benefit === 'string') return benefit
+    if (typeof benefit === 'object' && benefit !== null) {
+      // Handle {title, description} format
+      if (benefit.title && benefit.description) {
+        return `${benefit.title}: ${benefit.description}`
+      }
+      // Handle other object formats
+      if (benefit.name) return benefit.name
+      if (benefit.description) return benefit.description
+      if (benefit.title) return benefit.title
+      return JSON.stringify(benefit)
+    }
+    return String(benefit)
   }
 
 
@@ -971,7 +1006,7 @@ export default function Dashboard() {
                     <div className="flex flex-wrap gap-2">
                       {job.requirements.slice(0, 4).map((req, idx) => (
                         <Badge key={idx} variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-                          {req}
+                          {renderRequirement(req)}
                         </Badge>
                       ))}
                       {job.requirements.length > 4 && (
@@ -1295,7 +1330,7 @@ export default function Dashboard() {
                   {selectedJob.requirements.map((req, idx) => (
                     <div key={idx} className="flex items-center space-x-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
-                      <span>{req}</span>
+                      <span>{renderRequirement(req)}</span>
                     </div>
                   ))}
                 </div>
@@ -1309,7 +1344,7 @@ export default function Dashboard() {
                     {selectedJob.benefits.map((benefit, idx) => (
                       <div key={idx} className="flex items-center space-x-2 text-sm">
                         <Star className="h-4 w-4 text-yellow-500 flex-shrink-0" />
-                        <span>{benefit}</span>
+                        <span>{renderBenefit(benefit)}</span>
                       </div>
                     ))}
                   </div>
