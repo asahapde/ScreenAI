@@ -48,98 +48,18 @@ export class WebScraper {
         throw new Error('Invalid GitHub URL')
       }
 
-      // Check if this is Abdullah's GitHub profile
-      if (username === 'asahapde' || url.includes('asahapde')) {
-        return this.getAbdullahGitHubProfile()
+      // Check if this should use basic demo profile
+      if (url.includes('alexjohnson') || username === 'alexjohnson') {
+        return this.getBasicGitHubProfile()
       }
 
-      // Use GitHub API instead of scraping HTML for better reliability
-      const apiUrl = `https://api.github.com/users/${username}`
-      const reposUrl = `https://api.github.com/users/${username}/repos?sort=updated&per_page=100`
-      const eventsUrl = `https://api.github.com/users/${username}/events?per_page=100`
-
-      const [userResponse, reposResponse, eventsResponse] = await Promise.all([
-        fetch(apiUrl, {
-          headers: {
-            'User-Agent': this.userAgent,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        }),
-        fetch(reposUrl, {
-          headers: {
-            'User-Agent': this.userAgent,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        }),
-        fetch(eventsUrl, {
-          headers: {
-            'User-Agent': this.userAgent,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        }).catch(() => null) // Events API might fail, make it optional
-      ])
-
-      if (!userResponse.ok || !reposResponse.ok) {
-        throw new Error('Failed to fetch GitHub data')
+      // Check if this should use red flag demo profile
+      if (url.includes('alexsmith') || username === 'alexsmith') {
+        return this.getRedFlagGitHubProfile()
       }
 
-      const userData = await userResponse.json()
-      const reposData = await reposResponse.json()
-      const eventsData = eventsResponse?.ok ? await eventsResponse.json() : []
-
-      const repositories: Repository[] = reposData.map((repo: any) => ({
-        name: repo.name,
-        description: repo.description || '',
-        language: repo.language || '',
-        stars: repo.stargazers_count || 0,
-        forks: repo.forks_count || 0,
-        updated: repo.updated_at,
-        topics: repo.topics || [],
-        size: repo.size || 0,
-        isForked: repo.fork || false,
-        hasIssues: repo.has_issues || false,
-        openIssues: repo.open_issues_count || 0,
-        license: repo.license?.name || null,
-        defaultBranch: repo.default_branch || 'main',
-        pushedAt: repo.pushed_at,
-        homepage: repo.homepage || null
-      }))
-
-      // Enhanced language analysis
-      const languageStats = await this.analyzeLanguageUsage(repositories)
-      const commitPatterns = this.analyzeCommitPatterns(eventsData)
-      const repoQuality = this.analyzeRepositoryQuality(repositories)
-      const contributionMetrics = await this.getDetailedContributions(username, repositories)
-
-      // Calculate account age
-      const createdDate = new Date(userData.created_at)
-      const accountAge = Math.floor((Date.now() - createdDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
-
-      return {
-        username,
-        profile: userData.bio || userData.name || username,
-        repositories,
-        contributions: contributionMetrics.totalContributions,
-        followers: userData.followers || 0,
-        following: userData.following || 0,
-        languages: languageStats.languages,
-        totalCommits: contributionMetrics.totalCommits,
-        accountAge,
-        // Enhanced metrics
-        languageStats,
-        commitPatterns,
-        repoQuality,
-        contributionMetrics,
-        publicRepos: userData.public_repos || 0,
-        publicGists: userData.public_gists || 0,
-        location: userData.location || null,
-        company: userData.company || null,
-        blog: userData.blog || null,
-        hireable: userData.hireable || false,
-        lastActive: this.getLastActiveDate(eventsData),
-        topRepositories: this.getTopRepositories(repositories),
-        collaborationScore: this.calculateCollaborationScore(repositories, eventsData)
-      }
+      // Default to enhanced GitHub profile for demo purposes
+      return this.getEnhancedGitHubProfile()
     } catch (error) {
       console.error('GitHub scraping error:', error)
       throw error
@@ -147,50 +67,18 @@ export class WebScraper {
   }
 
   private async scrapeLinkedIn(url: string): Promise<LinkedInProfile> {
-    // Check if this is Abdullah's LinkedIn profile
-    if (url.includes('abdullah-sahapdeen') || url.includes('asahapde')) {
-      return this.getAbdullahLinkedInProfile()
+    // Check if this should use basic demo profile
+    if (url.includes('alex-johnson-dev')) {
+      return this.getBasicLinkedInProfile()
     }
 
-    // Note: LinkedIn actively blocks automated scraping
-    // In production, you would use LinkedIn API or alternative methods
-    try {
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': this.userAgent
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch LinkedIn profile')
-      }
-
-      const html = await response.text()
-      const $ = cheerio.load(html)
-
-      // Extract basic information (this is simplified and may not work due to LinkedIn's anti-scraping measures)
-      const name = $('h1').first().text().trim()
-      const headline = $('.pv-text-details__left-panel h2').text().trim()
-
-      return {
-        name: name || 'Unknown',
-        headline: headline || '',
-        experience: [], // Would require more complex extraction
-        education: [], // Would require more complex extraction
-        skills: [], // Would require more complex extraction
-        connections: undefined
-      }
-    } catch (error) {
-      console.error('LinkedIn scraping error:', error)
-      // Return fallback data
-      return {
-        name: 'LinkedIn Profile',
-        headline: 'Unable to scrape LinkedIn profile',
-        experience: [],
-        education: [],
-        skills: []
-      }
+    // Check if this should use red flag demo profile
+    if (url.includes('alex-smith-dev')) {
+      return this.getRedFlagLinkedInProfile()
     }
+
+    // Default to enhanced LinkedIn profile for demo purposes
+    return this.getEnhancedLinkedInProfile()
   }
 
   private async scrapePortfolio(url: string): Promise<PortfolioData> {
@@ -572,9 +460,9 @@ export class WebScraper {
     )
   }
 
-  private getAbdullahGitHubProfile(): GitHubProfile {
+  private getEnhancedGitHubProfile(): GitHubProfile {
     return {
-      username: 'asahapde',
+      username: 'marcuschen',
       profile: 'Senior Software Engineer passionate about building scalable web applications and AI-powered solutions. Open source contributor with expertise in React, Node.js, and Python.',
       repositories: [
         {
@@ -754,7 +642,7 @@ export class WebScraper {
       publicGists: 23,
       location: 'San Francisco, CA',
       company: 'TechFlow Solutions',
-      blog: 'https://abdullahsahapde.dev/blog',
+      blog: 'https://marcuschen.dev/blog',
       hireable: true,
       lastActive: '2024-01-20',
       topRepositories: [
@@ -790,9 +678,9 @@ export class WebScraper {
     }
   }
 
-  private getAbdullahLinkedInProfile(): LinkedInProfile {
+  private getEnhancedLinkedInProfile(): LinkedInProfile {
     return {
-      name: 'Abdullah Sahapde',
+      name: 'Marcus Chen',
       profile: 'Senior Software Engineer at TechFlow Solutions',
       headline: 'Senior Software Engineer | Full-Stack Developer | AI/ML Enthusiast | Building Scalable Solutions',
       experience: [
@@ -847,6 +735,369 @@ export class WebScraper {
         { name: 'Agile Development', endorsements: 62 }
       ],
       connections: 500
+    }
+  }
+
+  private getBasicGitHubProfile(): GitHubProfile {
+    return {
+      username: 'alexjohnson',
+      profile: 'Software Engineer with 4+ years of experience in web development',
+      repositories: [
+        {
+          name: 'portfolio-website',
+          description: 'Personal portfolio website built with React and CSS',
+          language: 'JavaScript',
+          stars: 12,
+          forks: 3,
+          updated: '2024-01-10',
+          topics: ['react', 'portfolio', 'css'],
+          size: 2340,
+          isForked: false,
+          hasIssues: true,
+          openIssues: 2,
+          license: 'MIT',
+          defaultBranch: 'main',
+          pushedAt: '2024-01-10',
+          homepage: 'https://alexjohnson.dev'
+        },
+        {
+          name: 'todo-app-react',
+          description: 'Simple todo application with React hooks and local storage',
+          language: 'JavaScript',
+          stars: 8,
+          forks: 2,
+          updated: '2023-12-15',
+          topics: ['react', 'todo', 'hooks'],
+          size: 1890,
+          isForked: false,
+          hasIssues: false,
+          openIssues: 0,
+          license: 'MIT',
+          defaultBranch: 'main',
+          pushedAt: '2023-12-15',
+          homepage: null
+        },
+        {
+          name: 'weather-api',
+          description: 'Weather API service built with Node.js and Express',
+          language: 'JavaScript',
+          stars: 15,
+          forks: 4,
+          updated: '2023-11-20',
+          topics: ['nodejs', 'express', 'api', 'weather'],
+          size: 3120,
+          isForked: false,
+          hasIssues: true,
+          openIssues: 1,
+          license: 'MIT',
+          defaultBranch: 'main',
+          pushedAt: '2023-11-20',
+          homepage: null
+        }
+      ],
+      contributions: 456,
+      followers: 23,
+      following: 34,
+      languages: ['JavaScript', 'HTML', 'CSS', 'Python'],
+      totalCommits: 578,
+      accountAge: 3,
+      languageStats: {
+        languages: ['JavaScript', 'HTML', 'CSS', 'Python'],
+        distribution: {
+          'JavaScript': 65,
+          'HTML': 15,
+          'CSS': 12,
+          'Python': 8
+        },
+        primaryLanguage: 'JavaScript',
+        diversityScore: 5.2
+      },
+      commitPatterns: {
+        recentActivity: 34,
+        commitFrequency: 'Moderate',
+        activeHours: [19, 20, 21, 22],
+        activeDays: ['Saturday', 'Sunday', 'Wednesday'],
+        consistencyScore: 6.1
+      },
+      repoQuality: {
+        averageStars: 11.7,
+        totalStars: 35,
+        documentedRepos: 2,
+        activeRepos: 3,
+        qualityScore: 6.8,
+        topProjects: [
+          {
+            name: 'weather-api',
+            description: 'Weather API service built with Node.js and Express',
+            language: 'JavaScript',
+            stars: 15,
+            forks: 4,
+            updated: '2023-11-20',
+            topics: ['nodejs', 'express', 'api', 'weather']
+          },
+          {
+            name: 'portfolio-website',
+            description: 'Personal portfolio website built with React and CSS',
+            language: 'JavaScript',
+            stars: 12,
+            forks: 3,
+            updated: '2024-01-10',
+            topics: ['react', 'portfolio', 'css']
+          }
+        ]
+      },
+      contributionMetrics: {
+        totalContributions: 456,
+        totalCommits: 578,
+        ownRepoCommits: 523,
+        forkedRepoCommits: 55,
+        issuesOpened: 12,
+        pullRequestsCreated: 8
+      },
+      publicRepos: 15,
+      publicGists: 3,
+      location: 'Austin, TX',
+      company: 'CloudTech Solutions',
+      blog: null,
+      hireable: true,
+      lastActive: '2024-01-10',
+      topRepositories: [
+        {
+          name: 'weather-api',
+          description: 'Weather API service built with Node.js and Express',
+          language: 'JavaScript',
+          stars: 15,
+          forks: 4,
+          updated: '2023-11-20',
+          topics: ['nodejs', 'express', 'api', 'weather']
+        },
+        {
+          name: 'portfolio-website',
+          description: 'Personal portfolio website built with React and CSS',
+          language: 'JavaScript',
+          stars: 12,
+          forks: 3,
+          updated: '2024-01-10',
+          topics: ['react', 'portfolio', 'css']
+        }
+      ],
+      collaborationScore: 5.4
+    }
+  }
+
+  private getBasicLinkedInProfile(): LinkedInProfile {
+    return {
+      name: 'Alex Johnson',
+      profile: 'Software Engineer at CloudTech Solutions',
+      headline: 'Software Engineer | Web Development | React & Node.js',
+      experience: [
+        {
+          company: 'CloudTech Solutions',
+          position: 'Software Engineer',
+          duration: '2021 - Present',
+          description: 'Developing web applications with React and Node.js. Working with team to deliver client projects and maintain existing systems. Participating in code reviews and agile development processes.'
+        },
+        {
+          company: 'WebDev Studios',
+          position: 'Junior Developer',
+          duration: '2020 - 2021',
+          description: 'Built responsive websites using HTML, CSS, and JavaScript. Learned modern frameworks and worked on small team projects. Gained experience in version control and basic deployment processes.'
+        }
+      ],
+      education: [
+        {
+          school: 'State University',
+          degree: 'Bachelor of Science',
+          field: 'Computer Science',
+          years: '2016 - 2020'
+        }
+      ],
+      skills: [
+        { name: 'JavaScript', endorsements: 18 },
+        { name: 'React', endorsements: 15 },
+        { name: 'Node.js', endorsements: 12 },
+        { name: 'HTML', endorsements: 22 },
+        { name: 'CSS', endorsements: 19 },
+        { name: 'Git', endorsements: 14 },
+        { name: 'SQL', endorsements: 8 },
+        { name: 'AWS', endorsements: 6 }
+      ],
+      connections: 89
+    }
+  }
+
+  private getRedFlagGitHubProfile(): GitHubProfile {
+    return {
+      username: 'alexsmith',
+      profile: 'Full-Stack Developer | AI/ML Expert | Blockchain Enthusiast',
+      repositories: [
+        {
+          name: 'my-portfolio',
+          description: 'Personal portfolio website',
+          language: 'HTML',
+          stars: 0,
+          forks: 0,
+          updated: '2024-01-10',
+          topics: ['portfolio', 'html', 'css'],
+          size: 230,
+          isForked: false,
+          hasIssues: false,
+          openIssues: 0,
+          license: null,
+          defaultBranch: 'main',
+          pushedAt: '2024-01-10',
+          homepage: null
+        },
+        {
+          name: 'calculator-app',
+          description: 'Simple calculator built with JavaScript',
+          language: 'JavaScript',
+          stars: 1,
+          forks: 0,
+          updated: '2023-11-20',
+          topics: ['calculator', 'javascript'],
+          size: 180,
+          isForked: false,
+          hasIssues: false,
+          openIssues: 0,
+          license: null,
+          defaultBranch: 'main',
+          pushedAt: '2023-11-20',
+          homepage: null
+        },
+        {
+          name: 'wordpress-theme',
+          description: 'Custom WordPress theme',
+          language: 'PHP',
+          stars: 0,
+          forks: 0,
+          updated: '2023-09-15',
+          topics: ['wordpress', 'php', 'theme'],
+          size: 340,
+          isForked: false,
+          hasIssues: false,
+          openIssues: 0,
+          license: null,
+          defaultBranch: 'main',
+          pushedAt: '2023-09-15',
+          homepage: null
+        }
+      ],
+      contributions: 23,
+      followers: 2,
+      following: 8,
+      languages: ['HTML', 'JavaScript', 'PHP'],
+      totalCommits: 31,
+      accountAge: 2,
+      languageStats: {
+        languages: ['HTML', 'JavaScript', 'PHP'],
+        distribution: {
+          'HTML': 45,
+          'JavaScript': 35,
+          'PHP': 20
+        },
+        primaryLanguage: 'HTML',
+        diversityScore: 3.2
+      },
+      commitPatterns: {
+        recentActivity: 3,
+        commitFrequency: 'Very Low',
+        activeHours: [23],
+        activeDays: ['Saturday'],
+        consistencyScore: 1.2
+      },
+      repoQuality: {
+        averageStars: 0.3,
+        totalStars: 1,
+        documentedRepos: 0,
+        activeRepos: 1,
+        qualityScore: 0.8,
+        topProjects: [
+          {
+            name: 'calculator-app',
+            description: 'Simple calculator built with JavaScript',
+            language: 'JavaScript',
+            stars: 1,
+            forks: 0,
+            updated: '2023-11-20',
+            topics: ['calculator', 'javascript']
+          }
+        ]
+      },
+      contributionMetrics: {
+        totalContributions: 23,
+        totalCommits: 31,
+        ownRepoCommits: 31,
+        forkedRepoCommits: 0,
+        issuesOpened: 0,
+        pullRequestsCreated: 0
+      },
+      publicRepos: 3,
+      publicGists: 0,
+      location: null,
+      company: null,
+      blog: null,
+      hireable: false,
+      lastActive: '2024-01-10',
+      topRepositories: [
+        {
+          name: 'calculator-app',
+          description: 'Simple calculator built with JavaScript',
+          language: 'JavaScript',
+          stars: 1,
+          forks: 0,
+          updated: '2023-11-20',
+          topics: ['calculator', 'javascript']
+        }
+      ],
+      collaborationScore: 0.5
+    }
+  }
+
+  private getRedFlagLinkedInProfile(): LinkedInProfile {
+    return {
+      name: 'Alex Smith',
+      profile: 'Full-Stack Developer | AI/ML Expert | Blockchain Specialist',
+      headline: 'Senior Software Engineer | Leading AI Innovation | 6+ Years Experience',
+      experience: [
+        {
+          company: 'TechFlow Solutions',
+          position: 'Full-Stack Developer',
+          duration: '2022 - Present',
+          description: 'Building modern web applications with React and Node.js. Working on client projects and maintaining systems.'
+        },
+        {
+          company: 'WebDev Inc',
+          position: 'Frontend Developer',
+          duration: '2020 - 2022',
+          description: 'Developed user interfaces using HTML, CSS, JavaScript. Worked with jQuery and Bootstrap frameworks.'
+        },
+        {
+          company: 'Freelance',
+          position: 'Web Developer',
+          duration: '2019 - 2020',
+          description: 'Created WordPress websites for small businesses. Basic HTML/CSS customization and maintenance.'
+        }
+      ],
+      education: [
+        {
+          school: 'Community College of Tech',
+          degree: 'Associate Degree in Web Development',
+          field: 'Web Development',
+          years: '2016 - 2018'
+        }
+      ],
+      skills: [
+        { name: 'HTML', endorsements: 12 },
+        { name: 'CSS', endorsements: 9 },
+        { name: 'JavaScript', endorsements: 7 },
+        { name: 'WordPress', endorsements: 15 },
+        { name: 'jQuery', endorsements: 6 },
+        { name: 'React', endorsements: 3 },
+        { name: 'Node.js', endorsements: 2 },
+        { name: 'PHP', endorsements: 4 }
+      ],
+      connections: 34
     }
   }
 } 

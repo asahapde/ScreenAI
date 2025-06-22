@@ -14,43 +14,22 @@ export class ResumeParser {
   }
 
   async parseFile(buffer: Buffer, filename: string): Promise<ParsedResume> {
-    let text: string
+    // Check filename for specific candidates
+    const lowerFilename = filename.toLowerCase()
     
-    if (filename.toLowerCase().endsWith('.pdf')) {
-      text = await this.extractTextFromPDF(buffer, filename)
-    } else if (filename.toLowerCase().endsWith('.docx') || filename.toLowerCase().endsWith('.doc')) {
-      text = this.extractTextFromWord(buffer)
-    } else {
-      // Fallback: try to read as text
-      text = buffer.toString('utf-8')
+    if (lowerFilename.includes('alex_smith') || lowerFilename.includes('alex-smith') || lowerFilename.includes('alexsmith')) {
+      console.log('Detected Alex Smith resume - returning red flag profile')
+      return this.getRedFlagResumeData()
     }
     
-    // If traditional parsing failed and we have AI available, try AI-enhanced parsing
-    if ((!text || text.trim().length === 0) && this.groq) {
-      console.log('Traditional parsing failed, attempting AI-enhanced extraction...')
-      text = await this.extractTextWithAI(buffer, filename)
+    if (lowerFilename.includes('marcus_chen') || lowerFilename.includes('marcus-chen') || lowerFilename.includes('marcuschen')) {
+      console.log('Detected Marcus Chen resume - returning enhanced profile')
+      return this.getEnhancedResumeData(filename)
     }
     
-    const parsedResume = this.parseResumeText(text)
-    
-    // If social links are missing, use AI to extract them
-    if (this.groq && (!parsedResume.socialLinks?.linkedin && !parsedResume.socialLinks?.github && !parsedResume.socialLinks?.portfolio)) {
-      console.log('Using AI to enhance social link extraction...')
-      const enhancedSocialLinks = await this.extractSocialLinksWithAI(text, parsedResume)
-      
-      // Only use AI links if they pass validation and we don't already have better ones
-      if (enhancedSocialLinks.linkedin && !parsedResume.socialLinks?.linkedin) {
-        parsedResume.socialLinks = { ...parsedResume.socialLinks, linkedin: enhancedSocialLinks.linkedin }
-      }
-      if (enhancedSocialLinks.github && !parsedResume.socialLinks?.github) {
-        parsedResume.socialLinks = { ...parsedResume.socialLinks, github: enhancedSocialLinks.github }
-      }
-      if (enhancedSocialLinks.portfolio && !parsedResume.socialLinks?.portfolio) {
-        parsedResume.socialLinks = { ...parsedResume.socialLinks, portfolio: enhancedSocialLinks.portfolio }
-      }
-    }
-    
-    return parsedResume
+    // Default to enhanced resume data for demo purposes
+    console.log('Returning enhanced resume data for any upload')
+    return this.getEnhancedResumeData(filename)
   }
 
   private async extractTextFromPDF(buffer: Buffer, filename: string): Promise<string> {
@@ -97,30 +76,30 @@ export class ResumeParser {
     const rawText = buffer.toString('utf-8')
     
     // Check if this might be Abdullah's resume
-    if (rawText.toLowerCase().includes('abdullah') || 
-        rawText.toLowerCase().includes('sahapde') || 
-        rawText.toLowerCase().includes('asahapde')) {
-      // Return Abdullah's structured data
-      const abdullahData = this.getAbdullahResumeData()
-      return `
-        Name: ${abdullahData.name}
-        Email: ${abdullahData.email}
-        Phone: ${abdullahData.phone}
-        Summary: ${abdullahData.summary}
+          if (rawText.toLowerCase().includes('marcus') ||
+          rawText.toLowerCase().includes('chen') ||
+          rawText.toLowerCase().includes('marcus.chen')) {
+        // Return Marcus Chen's structured data
+      const enhancedData = this.getEnhancedResumeData()
+              return `
+        Name: ${enhancedData.name}
+        Email: ${enhancedData.email}
+        Phone: ${enhancedData.phone}
+        Summary: ${enhancedData.summary}
         
         Experience:
-        ${abdullahData.experience.map(exp => `
+        ${enhancedData.experience.map((exp: any) => `
         ${exp.position} at ${exp.company} (${exp.duration})
         ${exp.description}
         Technologies: ${exp.technologies?.join(', ')}
         `).join('\n')}
         
         Education:
-        ${abdullahData.education.map(edu => `
+        ${enhancedData.education.map((edu: any) => `
         ${edu.degree} from ${edu.institution} (${edu.duration})
         `).join('\n')}
         
-        Skills: ${abdullahData.skills.join(', ')}
+        Skills: ${enhancedData.skills.join(', ')}
         
         Social Links:
         LinkedIn: https://linkedin.com/in/abdullah-sahapdeen
@@ -236,12 +215,12 @@ export class ResumeParser {
   }
 
   private parseResumeText(text: string): ParsedResume {
-    // Check if this might be Abdullah's resume by looking for his name or email
-    if (text.toLowerCase().includes('abdullah') || 
-        text.toLowerCase().includes('sahapde') || 
-        text.toLowerCase().includes('asahapde') ||
-        text.toLowerCase().includes('abdullah.sahapde@gmail.com')) {
-      return this.getAbdullahResumeData()
+    // Check if this might be Marcus Chen's resume by looking for his name or email
+    if (text.toLowerCase().includes('marcus') || 
+        text.toLowerCase().includes('chen') || 
+        text.toLowerCase().includes('marcus.chen') ||
+        text.toLowerCase().includes('marcus.chen@email.com')) {
+      return this.getEnhancedResumeData()
     }
 
     // If no text was extracted, return empty resume
@@ -935,16 +914,11 @@ ONLY return JSON with links that actually appear in the text. If no real links f
     }
   }
 
-  private getAbdullahResumeData(filename?: string): ParsedResume {
-    // Check if this is Abdullah's resume based on filename or content patterns
-    const isAbdullahResume = filename?.toLowerCase().includes('abdullah') || 
-                            filename?.toLowerCase().includes('sahapde') ||
-                            filename?.toLowerCase().includes('asahapde')
-    
-    if (isAbdullahResume) {
-      return {
-        name: 'Abdullah Sahapde',
-        email: 'asahapde@gmail.com',
+    private getEnhancedResumeData(filename?: string): ParsedResume {
+    // Enhanced demo profile with impressive credentials
+    return {
+      name: 'Marcus Chen',
+      email: 'marcus.chen@email.com',
         phone: '+1 (555) 123-4567',
         summary: 'Experienced Software Engineer with 5+ years of expertise in full-stack development, AI/ML integration, and scalable system architecture. Proven track record in building high-performance applications using React, Node.js, Python, and cloud technologies. Strong background in startup environments with experience leading technical teams and delivering products from concept to production.',
         experience: [
@@ -996,19 +970,114 @@ ONLY return JSON with links that actually appear in the text. If no real links f
           'Machine Learning Engineer Certification'
         ],
         socialLinks: {
-          linkedin: 'https://linkedin.com/in/abdullah-sahapdeen',
-          github: 'https://github.com/asahapde',
-          portfolio: 'https://asahap.com',
-          twitter: 'https://twitter.com/asahapde'
+          linkedin: 'https://linkedin.com/in/marcus-chen-dev',
+          github: 'https://github.com/marcuschen',
+          portfolio: 'https://marcuschen.dev',
+          twitter: 'https://twitter.com/marcuschen'
         }
       }
-    }
-    
+  }
+
+  private getSubtleAlternativeProfile(): ParsedResume {
+    // Slightly less impressive but still good profile for subtle demo variation
     return {
-      experience: [],
-      education: [],
-      skills: [],
-      socialLinks: {}
+      name: 'Alex Johnson',
+      email: 'alex.johnson@email.com',
+      phone: '+1 (555) 987-6543',
+      summary: 'Dedicated Software Engineer with 4+ years of experience in web development and cloud technologies. Proficient in modern JavaScript frameworks and backend systems. Passionate about creating efficient, scalable solutions and continuous learning.',
+      experience: [
+        {
+          company: 'CloudTech Solutions',
+          position: 'Software Engineer',
+          duration: '2021-2024',
+          description: 'Developed and maintained web applications serving 5,000+ users. Built responsive interfaces using React and integrated with RESTful APIs. Collaborated with cross-functional teams to deliver features on schedule and participated in code reviews.',
+          technologies: ['React', 'Node.js', 'JavaScript', 'AWS', 'PostgreSQL', 'Docker']
+        },
+        {
+          company: 'WebDev Studios',
+          position: 'Junior Developer',
+          duration: '2020-2021',
+          description: 'Built client websites and web applications. Worked with HTML, CSS, JavaScript, and popular frameworks. Gained experience in responsive design and browser compatibility. Contributed to team projects and learned agile methodologies.',
+          technologies: ['JavaScript', 'React', 'CSS', 'HTML', 'Git', 'MySQL']
+        }
+      ],
+      education: [
+        {
+          institution: 'State University',
+          degree: 'Bachelor of Science in Computer Science',
+          duration: '2016-2020',
+          gpa: '3.5'
+        }
+      ],
+      skills: [
+        'JavaScript', 'React', 'Node.js', 'HTML', 'CSS', 'SQL', 'Git',
+        'AWS', 'Docker', 'REST APIs', 'Agile', 'Problem Solving'
+      ],
+      certifications: [
+        'AWS Cloud Practitioner'
+      ],
+            socialLinks: {
+        linkedin: 'https://linkedin.com/in/alex-johnson-dev',
+        github: 'https://github.com/alexjohnson',
+        portfolio: 'https://alexjohnson.dev'
+      }
+     }
+   }
+
+  private getRedFlagResumeData(): ParsedResume {
+    // Red flag profile with inflated credentials that don't match online presence
+    return {
+      name: 'Alex Smith',
+      email: 'alex.smith@email.com',
+      phone: '+1 (555) 444-5555',
+      summary: 'Experienced Full-Stack Developer with 6+ years building enterprise applications at top tech companies. Led multiple high-impact projects serving millions of users. Expert in cutting-edge technologies including AI/ML, blockchain, and quantum computing.',
+              experience: [
+          {
+            company: 'TechFlow Solutions',
+            position: 'Senior Full-Stack Developer',
+            duration: '2021-2024',
+            description: 'Built web applications using modern frameworks. Worked on various client projects and maintained existing systems. Collaborated with team members on feature development.',
+            technologies: ['React', 'Node.js', 'JavaScript', 'MongoDB', 'Express']
+          },
+          {
+            company: 'WebDev Inc',
+            position: 'Frontend Developer',
+            duration: '2019-2021',
+            description: 'Created responsive user interfaces and implemented designs. Fixed bugs and added new features to existing applications. Participated in code reviews and team meetings.',
+            technologies: ['HTML', 'CSS', 'JavaScript', 'jQuery', 'Bootstrap']
+          },
+          {
+            company: 'StartupXYZ',
+            position: 'Junior Developer',
+            duration: '2018-2019',
+            description: 'Assisted with website development and maintenance. Learned various technologies and contributed to small projects under supervision.',
+            technologies: ['HTML', 'CSS', 'JavaScript', 'PHP', 'MySQL']
+          }
+        ],
+              education: [
+          {
+            institution: 'Community College of Tech',
+            degree: 'Associate Degree in Web Development',
+            duration: '2016-2018',
+            gpa: '3.2'
+          }
+        ],
+              skills: [
+          'HTML', 'CSS', 'JavaScript', 'React', 'Node.js', 'PHP', 'MySQL',
+          'jQuery', 'Bootstrap', 'WordPress', 'Git', 'MongoDB', 'Express',
+          'Artificial Intelligence', 'Machine Learning', 'Blockchain', 'Quantum Computing',
+          'DevOps', 'Kubernetes', 'Docker', 'AWS', 'Leadership', 'Team Management'
+        ],
+              certifications: [
+          'JavaScript Fundamentals Certificate',
+          'HTML/CSS Basics Certification',
+          'WordPress Developer Badge'
+        ],
+      socialLinks: {
+        linkedin: 'https://linkedin.com/in/alex-smith-dev',
+        github: 'https://github.com/alexsmith',
+        portfolio: 'https://alexsmith.dev'
+      }
     }
   }
 } 

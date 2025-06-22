@@ -263,82 +263,349 @@ async function sendUpdate(
 }
 
 function createMockAnalysis(candidateId: string, candidateData: CandidateData): AnalysisResult {
+  // Enhanced profile for Marcus Chen
+  if (candidateId === 'enhanced-demo') {
+    return {
+      id: `analysis_${candidateId}`,
+      candidateId,
+      fitScore: 96,
+      overallConfidence: 94,
+      strengths: [
+        {
+          category: "Technical Excellence",
+          description: "Exceptional proficiency in modern web technologies",
+          evidence: [
+            "5+ years experience with React, Node.js, and Python",
+            "1,139+ stars across GitHub repositories",
+            "Senior engineer role with proven leadership"
+          ],
+          confidence: 96
+        },
+        {
+          category: "Architecture & Scale",
+          description: "Proven experience building scalable systems",
+          evidence: [
+            "Led development of AI platform serving 10,000+ users",
+            "Microservices architecture expertise",
+            "Machine learning integration experience"
+          ],
+          confidence: 93
+        }
+      ],
+      gaps: [],
+      redFlags: [],
+      highlights: [
+        "Exceptional GitHub profile with 1,139 stars",
+        "Strong educational background (UC Berkeley)",
+        "Proven leadership and mentoring experience",
+        "Active open source contributor",
+        "Machine learning and AI expertise"
+      ],
+      onlinePresenceScore: 96,
+      skillVerification: [
+        {
+          skill: "React",
+          claimed: true,
+          verified: true,
+          confidence: 98,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "Multiple high-quality React projects with 200+ stars",
+              relevance: 98
+            }
+          ]
+        },
+        {
+          skill: "Node.js",
+          claimed: true,
+          verified: true,
+          confidence: 96,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "Enterprise-grade Node.js applications",
+              relevance: 96
+            }
+          ]
+        },
+        {
+          skill: "Machine Learning",
+          claimed: true,
+          verified: true,
+          confidence: 94,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "ML price predictor with 156 stars",
+              relevance: 94
+            }
+          ]
+        }
+      ],
+      recommendation: "strong_match",
+      summary: "Marcus Chen is an exceptional candidate with outstanding technical skills, proven leadership experience, and a stellar online presence. His GitHub profile demonstrates consistent high-quality contributions, and his experience scaling AI platforms makes him an ideal fit for senior engineering roles.",
+      createdAt: new Date()
+    }
+  }
+
+  // Red flag profile for Alex Smith
+  if (candidateId === 'red-flag-demo') {
+    return {
+      id: `analysis_${candidateId}`,
+      candidateId,
+      fitScore: 18,
+      overallConfidence: 89,
+      strengths: [
+        {
+          category: "Basic Web Skills",
+          description: "Has fundamental HTML, CSS, and JavaScript knowledge",
+          evidence: [
+            "Community college web development education",
+            "Some experience with WordPress and jQuery",
+            "Basic portfolio website created"
+          ],
+          confidence: 62
+        }
+      ],
+      gaps: [
+        {
+          category: "Experience Gap",
+          description: "Insufficient professional experience for senior roles",
+          evidence: [
+            "Only 3 years total experience (2021-2024)",
+            "No leadership or mentoring experience",
+            "Limited to small company and freelance work"
+          ],
+          confidence: 94
+        },
+        {
+          category: "Technical Skills Gap",
+          description: "Lacks advanced technical skills and modern frameworks",
+          evidence: [
+            "No experience with cloud platforms (AWS, Azure, GCP)",
+            "No containerization or DevOps experience",
+            "Limited to basic HTML/CSS/JavaScript and WordPress"
+          ],
+          confidence: 91
+        },
+        {
+          category: "Educational Background",
+          description: "Limited formal computer science education",
+          evidence: [
+            "Only associate degree from community college",
+            "No bachelor's degree in computer science",
+            "Missing fundamental CS concepts and algorithms"
+          ],
+          confidence: 88
+        }
+      ],
+      redFlags: [
+        {
+          type: "misrepresentation",
+          description: "Inflated resume claims vs reality",
+          severity: "high",
+          evidence: [
+            "Claims expertise in AI/ML, blockchain, quantum computing with no evidence",
+            "Resume mentions 6+ years experience but LinkedIn shows only 3 years",
+            "Claims to be 'Senior Software Engineer' but current role is Full-Stack Developer"
+          ]
+        },
+        {
+          type: "gap",
+          description: "Significant technical skill deficiencies",
+          severity: "high",
+          evidence: [
+            "GitHub shows only basic HTML/JavaScript projects",
+            "No evidence of modern frameworks beyond basic React",
+            "Claims advanced technologies but repositories show beginner-level code"
+          ]
+        },
+        {
+          type: "concern",
+          description: "Limited professional growth",
+          severity: "medium",
+          evidence: [
+            "Only 1 GitHub star across all repositories",
+            "No open source contributions or community involvement",
+            "Limited professional network (34 LinkedIn connections)"
+          ]
+        },
+        {
+          type: "inconsistency",
+          description: "Resume vs online presence mismatch",
+          severity: "high",
+          evidence: [
+            "Claims to lead projects but GitHub shows individual basic projects",
+            "LinkedIn endorsements don't match claimed expertise level",
+            "Portfolio website lacks depth expected from claimed experience"
+          ]
+        }
+      ],
+      highlights: [
+        "⚠️ Inflated resume claims vs actual experience",
+        "⚠️ Significant technical skill gaps for senior roles",
+        "⚠️ Limited professional experience (only 3 years)",
+        "⚠️ Basic education background (associate degree only)",
+        "❌ NOT SUITABLE FOR SENIOR POSITIONS"
+      ],
+      onlinePresenceScore: 22,
+      skillVerification: [
+        {
+          skill: "HTML",
+          claimed: true,
+          verified: true,
+          confidence: 75,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "Basic portfolio website demonstrates HTML knowledge",
+              relevance: 70
+            }
+          ]
+        },
+        {
+          skill: "JavaScript",
+          claimed: true,
+          verified: true,
+          confidence: 45,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "Simple calculator app shows basic JavaScript understanding",
+              relevance: 40
+            }
+          ]
+        },
+        {
+          skill: "React",
+          claimed: true,
+          verified: false,
+          confidence: 20,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "No React projects found despite resume claims",
+              relevance: 0
+            }
+          ]
+        },
+        {
+          skill: "Artificial Intelligence",
+          claimed: true,
+          verified: false,
+          confidence: 5,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "No AI/ML projects found despite claims of expertise",
+              relevance: 0
+            }
+          ]
+        },
+        {
+          skill: "Blockchain",
+          claimed: true,
+          verified: false,
+          confidence: 5,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "No blockchain projects or smart contracts found",
+              relevance: 0
+            }
+          ]
+        },
+        {
+          skill: "Quantum Computing",
+          claimed: true,
+          verified: false,
+          confidence: 0,
+          evidence: [
+            {
+              source: "github",
+              type: "project",
+              description: "No quantum computing projects or research found",
+              relevance: 0
+            }
+          ]
+        }
+      ],
+      recommendation: "poor_match",
+      summary: "⚠️ UNSUITABLE CANDIDATE - Alex Smith shows significant gaps between resume claims and actual capabilities. While he has basic web development skills (HTML, CSS, JavaScript), his resume greatly inflates his experience and expertise. Claims of AI/ML, blockchain, and quantum computing expertise are completely unsubstantiated. Only 3 years of actual experience, mostly with basic technologies. Educational background is limited to an associate degree. GitHub shows beginner-level projects with minimal community engagement. NOT RECOMMENDED for senior or advanced technical positions.",
+      createdAt: new Date()
+    }
+  }
+
+  // Basic profile for Alex Johnson
   return {
     id: `analysis_${candidateId}`,
     candidateId,
-    fitScore: 84,
-    overallConfidence: 88,
+    fitScore: 74,
+    overallConfidence: 78,
     strengths: [
       {
-        category: "Technical Skills",
-        description: "Strong proficiency in React and Node.js",
+        category: "Web Development",
+        description: "Solid foundation in modern web technologies",
         evidence: [
-          "5+ years experience listed in resume",
-          "Multiple React projects visible on GitHub",
-          "Senior developer role at current company"
+          "4+ years experience with React and Node.js",
+          "Multiple projects demonstrating practical skills",
+          "Current role as Software Engineer"
         ],
-        confidence: 92
-      },
-      {
-        category: "Experience",
-        description: "Solid background in full-stack development",
-        evidence: [
-          "Progressive career advancement",
-          "Leadership roles in recent positions",
-          "Diverse project portfolio"
-        ],
-        confidence: 85
+        confidence: 82
       }
     ],
     gaps: [
       {
-        category: "DevOps",
-        description: "Limited experience with cloud infrastructure",
+        category: "Advanced Skills",
+        description: "Limited experience with advanced technologies",
         evidence: [
-          "No AWS/Azure projects in portfolio",
-          "Limited mention of infrastructure tools",
-          "No CI/CD pipeline experience evident"
+          "No machine learning or AI projects visible",
+          "Basic GitHub activity with few stars",
+          "Limited leadership or mentoring experience"
         ],
-        confidence: 78
+        confidence: 85
       }
     ],
     redFlags: [
       {
-        type: "inconsistency",
-        description: "Resume claims 5 years coding experience, but GitHub shows 3 years activity",
-        severity: "medium",
+        type: "concern",
+        description: "Relatively small online presence",
+        severity: "low",
         evidence: [
-          "Resume states coding since 2019",
-          "GitHub first commit in 2021",
-          "2-year gap unexplained"
+          "Only 35 total GitHub stars",
+          "Limited portfolio projects",
+          "Basic LinkedIn profile"
         ]
       }
     ],
     highlights: [
-      "Strong React and Node.js expertise",
-      "Consistent open source contributor",
-      "Good communication skills based on LinkedIn",
-      "Experience with modern development practices"
+      "Solid React and Node.js foundation",
+      "Steady career progression",
+      "Clean, well-structured code",
+      "Good team collaboration skills"
     ],
-    onlinePresenceScore: 75,
+    onlinePresenceScore: 68,
     skillVerification: [
       {
         skill: "React",
         claimed: true,
         verified: true,
-        confidence: 95,
+        confidence: 85,
         evidence: [
           {
             source: "github",
             type: "project",
-            description: "15 React projects with recent activity",
-            relevance: 95
-          },
-          {
-            source: "resume",
-            type: "experience",
-            description: "Listed as primary skill in multiple roles",
-            relevance: 85
+            description: "Several React projects with basic functionality",
+            relevance: 80
           }
         ]
       },
@@ -346,39 +613,19 @@ function createMockAnalysis(candidateId: string, candidateData: CandidateData): 
         skill: "Node.js",
         claimed: true,
         verified: true,
-        confidence: 88,
+        confidence: 78,
         evidence: [
           {
             source: "github",
             type: "project",
-            description: "12 Node.js backend projects",
-            relevance: 90
-          },
-          {
-            source: "resume",
-            type: "experience",
-            description: "Backend development experience",
-            relevance: 80
-          }
-        ]
-      },
-      {
-        skill: "AWS",
-        claimed: true,
-        verified: false,
-        confidence: 25,
-        evidence: [
-          {
-            source: "resume",
-            type: "experience",
-            description: "Mentioned in job requirements",
-            relevance: 30
+            description: "Basic Node.js API projects",
+            relevance: 75
           }
         ]
       }
     ],
     recommendation: "good_match",
-    summary: "This candidate demonstrates strong technical skills in React and Node.js with solid practical experience. While there are some consistency concerns and gaps in DevOps knowledge, they represent a good match for the role with potential for growth in identified areas.",
+    summary: "Alex Johnson is a competent developer with solid fundamentals and steady growth potential. While not as experienced as senior candidates, they demonstrate good technical skills and would be a reliable team member for mid-level positions.",
     createdAt: new Date()
   }
 } 

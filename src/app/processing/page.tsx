@@ -13,15 +13,15 @@ import { ProgressUpdate, Resume, Job } from "@/types"
 // Mock data - in real app this would come from API
   const mockResumes: Resume[] = [
   {
-    id: 'abdullah',
-    candidateName: 'Abdullah Sahapde',
-    email: 'asahapde@gmail.com',
+    id: 'enhanced-demo',
+    candidateName: 'Marcus Chen',
+    email: 'marcus.chen@email.com',
     phone: '+1 (555) 123-4567',
     uploadedAt: new Date('2024-01-20'),
-    fileName: 'abdullah_sahapde_resume.pdf',
+    fileName: 'marcus_chen_resume.pdf',
           parsedData: {
-        name: 'Abdullah Sahapde',
-        email: 'asahapde@gmail.com',
+        name: 'Marcus Chen',
+        email: 'marcus.chen@email.com',
       phone: '+1 (555) 123-4567',
       summary: 'Experienced Software Engineer with 5+ years of expertise in full-stack development, AI/ML integration, and scalable system architecture.',
       experience: [
@@ -42,14 +42,104 @@ import { ProgressUpdate, Resume, Job } from "@/types"
       ],
       skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'AWS', 'Docker', 'Machine Learning'],
               socialLinks: {
-          linkedin: 'https://linkedin.com/in/abdullah-sahapdeen',
-          github: 'https://github.com/asahapde',
-          portfolio: 'https://asahap.com'
+          linkedin: 'https://linkedin.com/in/marcus-chen-dev',
+          github: 'https://github.com/marcuschen',
+          portfolio: 'https://marcuschen.dev'
         }
     },
     status: 'pending',
     jobId: '1',
     aiScore: 96
+  },
+  {
+    id: 'basic-demo',
+    candidateName: 'Alex Johnson',
+    email: 'alex.johnson@email.com',
+    phone: '+1 (555) 987-6543',
+    uploadedAt: new Date('2024-01-18'),
+    fileName: 'alex_johnson_resume.pdf',
+    parsedData: {
+      name: 'Alex Johnson',
+      email: 'alex.johnson@email.com',
+      phone: '+1 (555) 987-6543',
+      summary: 'Software Engineer with 4+ years of experience in web development. Skilled in React, Node.js, and modern JavaScript frameworks.',
+      experience: [
+        {
+          company: 'WebTech Solutions',
+          position: 'Software Engineer',
+          duration: '2020-2024',
+          description: 'Developed and maintained web applications using React and Node.js.'
+        }
+      ],
+      education: [
+        {
+          institution: 'State University',
+          degree: 'Bachelor of Science in Computer Science',
+          duration: '2015-2019',
+          gpa: '3.4'
+        }
+      ],
+      skills: ['React', 'Node.js', 'JavaScript', 'HTML', 'CSS', 'MongoDB', 'Express'],
+      socialLinks: {
+        linkedin: 'https://linkedin.com/in/alex-johnson-dev',
+        github: 'https://github.com/alexjohnson',
+        portfolio: 'https://alexjohnson.dev'
+      }
+    },
+    status: 'pending',
+    jobId: '1',
+    aiScore: 74
+  },
+  {
+    id: 'red-flag-demo',
+    candidateName: 'Alex Smith',
+    email: 'alex.smith@email.com',
+    phone: '+1 (555) 444-5555',
+    uploadedAt: new Date('2024-01-17'),
+    fileName: 'ALEX_SMITH_RESUME.pdf',
+    parsedData: {
+      name: 'Alex Smith',
+      email: 'alex.smith@email.com',
+      phone: '+1 (555) 444-5555',
+      summary: 'Senior Full-Stack Engineer with 8+ years of experience building scalable applications at Fortune 500 companies. Expert in React, Node.js, and cloud architecture.',
+      experience: [
+        {
+          company: 'Google',
+          position: 'Senior Software Engineer',
+          duration: '2020-2024',
+          description: 'Led development of critical infrastructure serving 2 billion users.'
+        },
+        {
+          company: 'Facebook',
+          position: 'Software Engineer',
+          duration: '2018-2020',
+          description: 'Developed user-facing features for Facebook Marketplace.'
+        }
+      ],
+      education: [
+        {
+          institution: 'Stanford University',
+          degree: 'Master of Science in Computer Science',
+          duration: '2014-2016',
+          gpa: '3.9'
+        },
+        {
+          institution: 'MIT',
+          degree: 'Bachelor of Science in Computer Science',
+          duration: '2010-2014',
+          gpa: '3.8'
+        }
+      ],
+      skills: ['React', 'Node.js', 'Python', 'Go', 'Java', 'Kubernetes', 'Docker', 'AWS', 'GCP', 'Machine Learning'],
+      socialLinks: {
+        linkedin: 'https://linkedin.com/in/alex-smith-dev',
+        github: 'https://github.com/alexsmith',
+        portfolio: 'https://alexsmith.dev'
+      }
+    },
+    status: 'pending',
+    jobId: '1',
+    aiScore: 23
   },
   {
     id: '1',
@@ -210,6 +300,13 @@ const PROCESSING_STEPS = [
     estimatedTime: "10-15 seconds"
   },
   {
+    id: "scraping",
+    title: "Online Verification",
+    description: "Scraping GitHub, LinkedIn, and portfolio for verification",
+    icon: Globe,
+    estimatedTime: "15-25 seconds"
+  },
+  {
     id: "analyzing",
     title: "AI Analysis",
     description: "Analyzing skills, experience, and job compatibility",
@@ -255,19 +352,27 @@ function ProcessingContent() {
         { step: "parsing" as const, message: "Extracting text from resume..." },
         { step: "parsing" as const, message: "Identifying contact information..." },
         { step: "parsing" as const, message: "Processing work experience..." },
+        { step: "parsing" as const, message: "Detecting social media links..." },
+        { step: "scraping" as const, message: "Connecting to GitHub API..." },
+        { step: "scraping" as const, message: "Analyzing GitHub repositories..." },
+        { step: "scraping" as const, message: "Scraping LinkedIn profile..." },
+        { step: "scraping" as const, message: "Verifying portfolio website..." },
+        { step: "scraping" as const, message: "Cross-referencing social profiles..." },
         { step: "analyzing" as const, message: "Analyzing technical skills..." },
         { step: "analyzing" as const, message: "Evaluating experience relevance..." },
         { step: "analyzing" as const, message: "Assessing cultural fit..." },
-        { step: "analyzing" as const, message: "Comparing with job requirements..." },
-        { step: "analyzing" as const, message: "Calculating compatibility score..." },
+        { step: "matching" as const, message: "Comparing with job requirements..." },
+        { step: "matching" as const, message: "Calculating compatibility score..." },
         { step: "generating" as const, message: "Compiling analysis report..." },
         { step: "generating" as const, message: "Finalizing recommendations..." }
       ]
 
       for (let i = 0; i < steps.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000))
-        
+        // Add extra delay for scraping steps to feel more realistic
         const stepData = steps[i]
+        const baseDelay = stepData.step === 'scraping' ? 2000 : 1500
+        const randomDelay = stepData.step === 'scraping' ? Math.random() * 1500 : Math.random() * 1000
+        await new Promise(resolve => setTimeout(resolve, baseDelay + randomDelay))
         const stepIndex = PROCESSING_STEPS.findIndex(s => s.id === stepData.step)
         const stepProgress = ((i + 1) / steps.length) * 100
 

@@ -184,19 +184,21 @@ export async function processCandidateAction(candidateId: string) {
     if (process.env.GROQ_API_KEY) {
       const aiAnalyzer = new AIAnalyzer()
       
-      // Convert candidateData to ParsedResume format for the new analyzer
-      const resumeData = {
-        name: candidateData.resume?.parsed?.name,
-        email: candidateData.resume?.parsed?.email,
-        phone: candidateData.resume?.parsed?.phone,
-        summary: candidateData.resume?.parsed?.summary,
-        skills: candidateData.resume?.parsed?.skills || [],
-        experience: candidateData.resume?.parsed?.experience || [],
-        education: candidateData.resume?.parsed?.education || [],
-        socialLinks: candidateData.socialLinks
+      // Create a default job description if none provided
+      const defaultJobDescription: JobDescription = jobDescription || {
+        id: 'default',
+        title: 'Software Engineer',
+        company: 'Tech Company',
+        description: 'General software engineering position',
+        requirements: [],
+        responsibilities: [],
+        requiredSkills: ['JavaScript', 'React', 'Node.js'],
+        preferredSkills: ['TypeScript', 'AWS'],
+        experienceRequired: '2+ years',
+        content: 'Software development role'
       }
       
-      analysisResult = await aiAnalyzer.analyzeCandidate(resumeData)
+      analysisResult = await aiAnalyzer.analyzeCandidate(candidateData, onlinePresence, defaultJobDescription)
     } else {
       // Create mock analysis
       analysisResult = {

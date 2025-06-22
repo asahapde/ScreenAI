@@ -258,7 +258,7 @@ export interface Evidence {
 }
 
 export interface ProgressUpdate {
-  step: 'parsing' | 'scraping' | 'analyzing' | 'generating'
+  step: 'parsing' | 'scraping' | 'analyzing' | 'matching' | 'generating'
   progress: number
   message: string
   error?: string

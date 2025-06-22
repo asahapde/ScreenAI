@@ -61,14 +61,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create candidate ID - check if this is Abdullah's resume
-    let candidateId = generateId()
-    const isAbdullahResume = fileName.includes('abdullah') || 
-                           fileName.includes('sahapde') || 
-                           fileName.includes('asahapde')
+    // Determine candidate ID based on filename
+    let candidateId: string
+    let isAbdullahResume: boolean
     
-    if (isAbdullahResume) {
-      candidateId = 'abdullah' // Use consistent ID for Abdullah
+    const lowerFileName = file.name.toLowerCase()
+    
+    if (lowerFileName.includes('alex_smith') || lowerFileName.includes('alex-smith') || lowerFileName.includes('alexsmith')) {
+      // Route to red flag analysis for Alex Smith
+      candidateId = 'red-flag-demo'
+      isAbdullahResume = false
+    } else if (lowerFileName.includes('marcus_chen') || lowerFileName.includes('marcus-chen') || lowerFileName.includes('marcuschen')) {
+      // Route to enhanced/good analysis for Marcus Chen
+      candidateId = 'enhanced-demo'
+      isAbdullahResume = true
+    } else {
+      // Default to enhanced analysis
+      candidateId = 'enhanced-demo'
+      isAbdullahResume = true
     }
     
     // Convert file to buffer

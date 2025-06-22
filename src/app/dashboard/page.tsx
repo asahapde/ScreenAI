@@ -240,6 +240,8 @@ export default function Dashboard() {
   const [isUploading, setIsUploading] = useState(false)
   const [isParsing, setIsParsing] = useState(false)
   const [parseComplete, setParseComplete] = useState(false)
+  const [parseProgress, setParseProgress] = useState(0)
+  const [parseStep, setParseStep] = useState("")
   const [uploadError, setUploadError] = useState("")
   const [uploadFormData, setUploadFormData] = useState({
     linkedin: "",
@@ -248,6 +250,7 @@ export default function Dashboard() {
     extraContext: "",
     selectedJobId: ""
   })
+
 
   const allowedFileTypes = [
     "application/pdf",
@@ -276,6 +279,26 @@ export default function Dashboard() {
     setUploadError("")
     
     try {
+      // Show mock parsing progress with realistic delays
+      const parseSteps = [
+        "Reading file format...",
+        "Extracting text content...", 
+        "Identifying sections...",
+        "Parsing contact information...",
+        "Processing work experience...",
+        "Extracting education details...",
+        "Analyzing skills and technologies...",
+        "Detecting social media links...",
+        "Finalizing resume structure..."
+      ]
+      
+      // Simulate parsing steps with delays
+      for (let i = 0; i < parseSteps.length; i++) {
+        setParseStep(parseSteps[i])
+        setParseProgress(Math.round(((i + 1) / parseSteps.length) * 100))
+        await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400))
+      }
+      
       const formData = new FormData()
       formData.append("file", file)
       
@@ -316,9 +339,13 @@ export default function Dashboard() {
       }
       
       setParseComplete(true)
+      setParseStep("")
+      setParseProgress(0)
     } catch (err) {
       console.error("Resume parsing error:", err)
       setUploadError("Failed to parse resume automatically. You can still proceed manually.")
+      setParseStep("")
+      setParseProgress(0)
     } finally {
       setIsParsing(false)
     }
@@ -411,11 +438,11 @@ export default function Dashboard() {
       formData.append("resume", resume)
       formData.append("candidateData", JSON.stringify({
         socialLinks: {
-          linkedin: uploadFormData.linkedin || 'https://linkedin.com/in/abdullah-sahapdeen',
-          github: uploadFormData.github || 'https://github.com/asahapde',
-          portfolio: uploadFormData.portfolio || 'https://asahap.com'
+          linkedin: uploadFormData.linkedin || 'https://linkedin.com/in/marcus-chen-dev',
+          github: uploadFormData.github || 'https://github.com/marcuschen',
+          portfolio: uploadFormData.portfolio || 'https://marcuschen.dev'
         },
-        extraContext: uploadFormData.extraContext || 'Experienced Software Engineer with 5+ years of expertise in full-stack development, AI/ML integration, and scalable system architecture.',
+        extraContext: uploadFormData.extraContext || 'Experienced Software Engineer with expertise in full-stack development and scalable system architecture.',
         jobDescription: uploadFormData.selectedJobId ? 
           jobs.find(job => job.id === uploadFormData.selectedJobId) : null
       }))
@@ -432,17 +459,31 @@ export default function Dashboard() {
 
       const result = await response.json()
       
-      // If this is Abdullah's resume, show processing flow then redirect
-      if (result.isAbdullah) {
+      // Always show processing flow for demo uploads
+      if (result.success) {
         // Show upload success briefly
         setUploadError("")
         
         // Show success message during processing
         const successMessage = "✅ Resume uploaded successfully! Analyzing candidate profile..."
         
+        // Determine candidate ID based on filename
+        let candidateId: string
+        const fileName = resume.name.toLowerCase()
+        
+        if (fileName.includes('marcus_chen') || fileName.includes('marcus-chen') || fileName.includes('marcuschen')) {
+          // Route to enhanced/good analysis for Marcus Chen
+          candidateId = 'enhanced-demo'
+        } else if (fileName.includes('alex_smith') || fileName.includes('alex-smith') || fileName.includes('alexsmith')) {
+          // Route to red flag analysis for Alex Smith
+          candidateId = 'red-flag-demo'
+        } else {
+          // Default to enhanced analysis
+          candidateId = 'enhanced-demo'
+        }
+        
         // Simulate processing time with status updates
         setTimeout(() => {
-          setIsUploading(false)
           setShowUploadModal(false)
           
           // Reset form
@@ -458,8 +499,10 @@ export default function Dashboard() {
           })
           
           // Redirect to processing page first, then to results
-          router.push('/processing?id=abdullah&from=dashboard')
+          router.push(`/processing?id=${candidateId}&from=dashboard`)
         }, 1500) // Show success for 1.5 seconds
+        
+        // Keep loading state until redirect happens
         return
       }
       
@@ -537,8 +580,7 @@ export default function Dashboard() {
       console.error("Upload error:", error)
       const errorMessage = error instanceof Error ? error.message : "Failed to upload resume. Please try again."
       setUploadError(errorMessage)
-    } finally {
-      setIsUploading(false)
+      setIsUploading(false) // Only stop loading on error
     }
   }
 
@@ -777,6 +819,8 @@ export default function Dashboard() {
                   <Users className="h-4 w-4" />
                   <span>{resumes.length} Candidates</span>
                 </div>
+                
+
               </div>
               
               <Button
@@ -1639,9 +1683,19 @@ export default function Dashboard() {
                           
                           {/* Parsing Status */}
                           {isParsing && (
-                            <div className="mt-4 flex items-center justify-center space-x-2">
-                              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                              <span className="text-sm text-blue-600">Parsing resume with AI...</span>
+                            <div className="mt-4 space-y-3">
+                              <div className="flex items-center justify-center space-x-2">
+                                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                                <span className="text-sm text-blue-600">Parsing resume with AI...</span>
+                              </div>
+                              {parseProgress > 0 && (
+                                <div className="space-y-2">
+                                  <Progress value={parseProgress} className="w-full" />
+                                  <div className="text-xs text-center text-gray-600">
+                                    {parseStep || "Processing..."}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                           

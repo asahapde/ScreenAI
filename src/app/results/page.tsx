@@ -60,15 +60,15 @@ import { StackOverflowAnalysis } from "@/components/analysis/stackoverflow-analy
 // Mock data with enhanced analysis
 const mockResumes: Resume[] = [
   {
-    id: 'abdullah',
-    candidateName: 'Abdullah Sahapde',
-    email: 'asahapde@gmail.com',
+    id: 'enhanced-demo',
+    candidateName: 'Marcus Chen',
+    email: 'marcus.chen@email.com',
     phone: '+1 (555) 123-4567',
     uploadedAt: new Date('2024-01-20'),
-    fileName: 'abdullah_sahapde_resume.pdf',
+    fileName: 'marcus_chen_resume.pdf',
     parsedData: {
-      name: 'Abdullah Sahapde',
-      email: 'asahapde@gmail.com',
+      name: 'Marcus Chen',
+      email: 'marcus.chen@email.com',
       phone: '+1 (555) 123-4567',
       summary: 'Experienced Software Engineer with 5+ years of expertise in full-stack development, AI/ML integration, and scalable system architecture.',
       experience: [
@@ -102,29 +102,80 @@ const mockResumes: Resume[] = [
         'Git', 'Linux', 'CI/CD', 'Jest', 'Cypress', 'Agile', 'Microservices'
       ],
       socialLinks: {
-        linkedin: 'https://linkedin.com/in/abdullah-sahapdeen',
-        github: 'https://github.com/asahapde',
-        portfolio: 'https://asahap.com',
-        twitter: 'https://twitter.com/asahapde'
+        linkedin: 'https://linkedin.com/in/marcus-chen-dev',
+        github: 'https://github.com/marcuschen',
+        portfolio: 'https://marcuschen.dev',
+        twitter: 'https://twitter.com/marcuschen'
       }
     },
     status: 'pending',
     jobId: '1',
-    aiScore: 96,
-    notes: 'Outstanding candidate with exceptional GitHub portfolio and strong technical leadership experience'
+    aiScore: 18,
+    notes: '⚠️ UNSUITABLE CANDIDATE - Significant gaps between resume claims and actual capabilities. Claims of AI/ML/blockchain expertise unsubstantiated. Only basic web development skills demonstrated.'
   },
   {
-    id: 'john-fake',
-    candidateName: 'John Thompson',
-    email: 'john.thompson@email.com',
+    id: 'basic-demo',
+    candidateName: 'Alex Johnson',
+    email: 'alex.johnson@email.com',
     phone: '+1 (555) 987-6543',
     uploadedAt: new Date('2024-01-18'),
-    fileName: 'john_thompson_resume.pdf',
+    fileName: 'alex_johnson_resume.pdf',
     parsedData: {
-      name: 'John Thompson',
-      email: 'john.thompson@email.com',
+      name: 'Alex Johnson',
+      email: 'alex.johnson@email.com',
       phone: '+1 (555) 987-6543',
-      summary: 'Senior Full-Stack Engineer with 8+ years of experience building scalable applications at Fortune 500 companies. Expert in React, Node.js, and cloud architecture.',
+      summary: 'Software Engineer with 4+ years of experience in web development. Skilled in React, Node.js, and modern JavaScript frameworks.',
+              experience: [
+        {
+          company: 'WebTech Solutions',
+          position: 'Software Engineer',
+          duration: '2020-2024',
+          description: 'Developed and maintained web applications using React and Node.js. Collaborated with team on various client projects.',
+          technologies: ['React', 'Node.js', 'JavaScript', 'MongoDB', 'Express']
+        },
+        {
+          company: 'StartupXYZ',
+          position: 'Junior Developer',
+          duration: '2019-2020',
+          description: 'Built frontend components and assisted with backend API development.',
+          technologies: ['React', 'JavaScript', 'REST APIs', 'Git']
+        }
+      ],
+      education: [
+        {
+          institution: 'State University',
+          degree: 'Bachelor of Science in Computer Science',
+          duration: '2015-2019',
+          gpa: '3.4'
+        }
+      ],
+      skills: [
+        'React', 'Node.js', 'JavaScript', 'HTML', 'CSS', 'MongoDB',
+        'Express', 'REST APIs', 'Git', 'Bootstrap', 'jQuery'
+      ],
+      socialLinks: {
+        linkedin: 'https://linkedin.com/in/alex-johnson-dev',
+        github: 'https://github.com/alexjohnson',
+        portfolio: 'https://alexjohnson.dev'
+      }
+    },
+    status: 'pending',
+    jobId: '1',
+    aiScore: 74,
+    notes: 'Solid candidate with good fundamentals and potential for growth.'
+  },
+  {
+    id: 'red-flag-demo',
+    candidateName: 'Alex Smith',
+    email: 'alex.smith@email.com',
+    phone: '+1 (555) 444-5555',
+    uploadedAt: new Date('2024-01-17'),
+    fileName: 'ALEX_SMITH_RESUME.pdf',
+    parsedData: {
+      name: 'Alex Smith',
+      email: 'alex.smith@email.com',
+      phone: '+1 (555) 444-5555',
+      summary: 'Experienced Full-Stack Developer with 6+ years building enterprise applications at top tech companies. Led multiple high-impact projects serving millions of users. Expert in cutting-edge technologies including AI/ML, blockchain, and quantum computing.',
       experience: [
         {
           company: 'Google',
@@ -168,9 +219,9 @@ const mockResumes: Resume[] = [
         'Redis', 'Machine Learning', 'TensorFlow', 'DevOps', 'CI/CD'
       ],
       socialLinks: {
-        linkedin: 'https://linkedin.com/in/john-thompson-dev',
-        github: 'https://github.com/johnthompson',
-        portfolio: 'https://johnthompson.dev'
+        linkedin: 'https://linkedin.com/in/alex-smith-dev',
+        github: 'https://github.com/alexsmith',
+        portfolio: 'https://alexsmith.dev'
       }
     },
     status: 'pending',
@@ -197,53 +248,53 @@ const mockJobs: Job[] = [
 ]
 
 // Red flag candidate analysis data
-const generateJohnFakeAnalysisData = () => {
+const generateBasicDemoAnalysisData = () => {
   return {
-    overallScore: 23,
-    matchPercentage: 15,
+    overallScore: 74,
+    matchPercentage: 68,
     
-    // GitHub Analysis Data - RED FLAGS
+    // GitHub Analysis Data - Basic Profile
     githubData: {
       profile: {
-        name: 'John Thompson',
-        bio: 'Senior Full-Stack Engineer at Google',
-        company: 'Google',
-        location: 'Mountain View, CA',
-        followers: 12,
-        following: 234,
-        publicRepos: 3,
-        totalStars: 4,
-        totalForks: 1,
-        contributions: 23
+        name: 'Alex Johnson',
+        bio: 'Software Engineer passionate about web development',
+        company: 'WebTech Solutions',
+        location: 'Austin, TX',
+        followers: 89,
+        following: 156,
+        publicRepos: 12,
+        totalStars: 35,
+        totalForks: 18,
+        contributions: 234
       },
       projects: [
         {
-          name: 'hello-world',
-          description: 'My first repository',
+          name: 'react-todo-app',
+          description: 'A simple todo application built with React',
           language: 'JavaScript',
-          stars: 2,
-          forks: 0,
-          commits: 3,
-          lastUpdated: '2 years ago',
-          technologies: ['JavaScript'],
-          codeQuality: 12,
-          resumeClaim: 'Led development of critical infrastructure serving 2 billion users',
-          verification: 'disputed' as const,
-          url: 'https://github.com/johnthompson/hello-world'
+          stars: 12,
+          forks: 4,
+          commits: 28,
+          lastUpdated: '3 months ago',
+          technologies: ['React', 'CSS', 'JavaScript'],
+          codeQuality: 72,
+          resumeClaim: 'Built web applications using React and Node.js',
+          verification: 'verified' as const,
+          url: 'https://github.com/alexjohnson/react-todo-app'
         },
         {
-          name: 'copied-tutorial',
-          description: 'React tutorial copy',
+          name: 'node-api-project',
+          description: 'RESTful API built with Node.js and Express',
           language: 'JavaScript',
-          stars: 1,
-          forks: 1,
-          commits: 1,
-          lastUpdated: '1 year ago',
-          technologies: ['React'],
-          codeQuality: 8,
-          resumeClaim: 'Built and maintained microservices architecture',
-          verification: 'disputed' as const,
-          url: 'https://github.com/johnthompson/copied-tutorial'
+          stars: 8,
+          forks: 2,
+          commits: 19,
+          lastUpdated: '5 months ago',
+          technologies: ['Node.js', 'Express', 'MongoDB'],
+          codeQuality: 68,
+          resumeClaim: 'Developed backend APIs with Node.js',
+          verification: 'verified' as const,
+          url: 'https://github.com/alexjohnson/node-api-project'
         }
       ],
       commits: [
@@ -307,9 +358,9 @@ const generateJohnFakeAnalysisData = () => {
       }
     },
 
-    // Culture Fit Data - POOR FIT
+    // Culture Fit Data - Decent Fit
     cultureFitData: {
-      overallFitScore: 18,
+      overallFitScore: 72,
       values: [
         {
           name: 'Honesty & Integrity',
@@ -350,9 +401,9 @@ const generateJohnFakeAnalysisData = () => {
       }
     },
 
-    // OA Assessment Data - FULL OA REQUIRED + CONCERNS
+    // OA Assessment Data - Recommended
     oaData: {
-      overallOARecommendation: 'full' as const,
+      overallOARecommendation: 'partial' as const,
       confidenceScore: 97,
       skillsAssessment: [
         {
@@ -495,10 +546,329 @@ const generateJohnFakeAnalysisData = () => {
 }
 
 // Enhanced mock data for comprehensive analysis
+const generateRedFlagAnalysisData = () => {
+  return {
+    overallScore: 18,
+    matchPercentage: 23,
+    
+    // GitHub Analysis Data
+    githubData: {
+      profile: {
+        name: 'Alex Smith',
+        bio: 'Full-Stack Developer | AI/ML Expert | Blockchain Enthusiast',
+        company: 'TechFlow Solutions',
+        location: 'Unknown',
+        followers: 2,
+        following: 8,
+        publicRepos: 3,
+        totalStars: 1,
+        totalForks: 0,
+        contributions: 23
+      },
+      projects: [
+        {
+          name: 'my-portfolio',
+          description: 'Personal portfolio website',
+          language: 'HTML',
+          stars: 0,
+          forks: 0,
+          commits: 8,
+          lastUpdated: '3 months ago',
+          technologies: ['HTML', 'CSS'],
+          codeQuality: 35,
+          resumeClaim: 'Led multiple high-impact projects serving millions of users',
+          verification: 'disputed' as const,
+          url: 'https://github.com/alexsmith/my-portfolio'
+        },
+        {
+          name: 'calculator-app',
+          description: 'Simple calculator built with JavaScript',
+          language: 'JavaScript',
+          stars: 1,
+          forks: 0,
+          commits: 12,
+          lastUpdated: '2 months ago',
+          technologies: ['JavaScript', 'HTML'],
+          codeQuality: 42,
+          resumeClaim: 'Expert in cutting-edge technologies including AI/ML',
+          verification: 'disputed' as const,
+          url: 'https://github.com/alexsmith/calculator-app'
+        },
+        {
+          name: 'wordpress-theme',
+          description: 'Custom WordPress theme',
+          language: 'PHP',
+          stars: 0,
+          forks: 0,
+          commits: 5,
+          lastUpdated: '4 months ago',
+          technologies: ['PHP', 'CSS'],
+          codeQuality: 38,
+          resumeClaim: 'Blockchain and quantum computing expertise',
+          verification: 'disputed' as const,
+          url: 'https://github.com/alexsmith/wordpress-theme'
+        }
+      ],
+      commits: [
+        {
+          date: '2024-01-10',
+          message: 'Update portfolio colors',
+          additions: 12,
+          deletions: 8,
+          sha: 'xyz789',
+          url: 'https://github.com/alexsmith/my-portfolio/commit/xyz789'
+        },
+        {
+          date: '2023-11-20',
+          message: 'Fix calculator bug',
+          additions: 3,
+          deletions: 1,
+          sha: 'abc456',
+          url: 'https://github.com/alexsmith/calculator-app/commit/abc456'
+        }
+      ],
+      languageStats: {
+        'HTML': 45,
+        'JavaScript': 35,
+        'PHP': 20
+      },
+      activityPattern: {
+        weeklyCommits: [1, 0, 2, 1, 0, 0, 1],
+        hourlyPattern: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2],
+        streakDays: 3,
+        mostActiveMonth: 'January 2024'
+      },
+      codeVerification: {
+        resumeSkills: ['AI', 'Machine Learning', 'Blockchain', 'Quantum Computing', 'React', 'Node.js', 'Kubernetes'],
+        verifiedSkills: ['HTML', 'CSS', 'JavaScript', 'PHP'],
+        disputedClaims: [
+          {
+            claim: 'Expert in AI/ML and blockchain technologies',
+            reality: 'No AI/ML or blockchain projects found in GitHub repositories',
+            confidence: 95
+          },
+          {
+            claim: '6+ years of experience leading teams',
+            reality: 'GitHub activity shows only 2 years with basic individual projects',
+            confidence: 92
+          },
+          {
+            claim: 'Built systems serving millions of users',
+            reality: 'Only basic portfolio and calculator projects with 1 total star',
+            confidence: 98
+          }
+        ]
+      },
+      aiGeneratedCodeDetection: {
+        overallAIScore: 15,
+        analysisResults: [
+          {
+            file: 'my-portfolio/index.html',
+            aiProbability: 25,
+            indicators: ['Template-like structure', 'Generic content', 'Basic implementation'],
+            vibeCheck: 'TEMPLATE_BASED'
+          },
+          {
+            file: 'calculator-app/script.js',
+            aiProbability: 8,
+            indicators: ['Simple logic', 'Basic variable naming'],
+            vibeCheck: 'HUMAN_WRITTEN'
+          }
+        ],
+        codePattern: 'MOSTLY_HUMAN'
+      }
+    },
+
+    // Culture Fit Data
+    cultureFitData: {
+      overallFitScore: 34,
+      values: [
+        {
+          name: 'Innovation',
+          candidateScore: 25,
+          companyScore: 85,
+          match: 29,
+          description: 'Limited evidence of innovative thinking in basic projects'
+        },
+        {
+          name: 'Collaboration',
+          candidateScore: 15,
+          companyScore: 90,
+          match: 17,
+          description: 'No evidence of teamwork or open source collaboration'
+        },
+        {
+          name: 'Growth Mindset',
+          candidateScore: 45,
+          companyScore: 88,
+          match: 51,
+          description: 'Some learning shown but limited technology exploration'
+        }
+      ],
+      teamDynamics: {
+        leadershipStyle: 'Individual Contributor',
+        collaborationScore: 25,
+        independenceScore: 60,
+        mentorshipInterest: 20
+      },
+      growthMindset: {
+        learningAgility: 35,
+        adaptability: 40,
+        innovationDrive: 25
+      },
+      companyAlignment: {
+        missionAlignment: 45,
+        industryPassion: 30
+      }
+    },
+
+    // OA Assessment Data
+    oaData: {
+      overallOARecommendation: 'full' as const,
+      confidenceScore: 15,
+      skillsAssessment: [
+        {
+          skill: 'Data Structures & Algorithms',
+          required: true,
+          githubEvidence: [
+            'No evidence of algorithmic thinking in projects',
+            'Basic calculator logic only',
+            'No complex data structure usage'
+          ],
+          proficiencyLevel: 20,
+          oaRequired: true,
+          reasoning: 'No evidence of algorithmic skills in codebase'
+        },
+        {
+          skill: 'System Design',
+          required: true,
+          githubEvidence: [
+            'Only basic HTML/CSS projects',
+            'No system architecture evidence',
+            'No scalability considerations'
+          ],
+          proficiencyLevel: 15,
+          oaRequired: true,
+          reasoning: 'No system design skills demonstrated'
+        }
+      ],
+      algorithmicThinking: {
+        score: 18,
+        evidence: [
+          'Basic calculator implementation',
+          'Simple HTML/CSS styling',
+          'No complex problem solving'
+        ],
+        oaNeeded: true
+      },
+      problemSolving: {
+        score: 22,
+        evidence: [
+          'Limited problem-solving complexity',
+          'Basic debugging in calculator',
+          'No optimization attempts'
+        ],
+        oaNeeded: true
+      },
+      codeQuality: {
+        score: 22,
+        evidence: [
+          'Basic HTML/CSS implementation',
+          'Simple JavaScript logic',
+          'No code documentation or tests'
+        ],
+        oaNeeded: true
+      },
+      domainExpertise: {
+        score: 15,
+        evidence: [
+          'No domain-specific knowledge demonstrated',
+          'Basic web development only',
+          'No advanced technical concepts'
+        ],
+        oaNeeded: true
+      },
+      summary: 'This candidate shows significant technical gaps and inflated resume claims. GitHub portfolio contains only basic projects that do not match claimed expertise in AI/ML, blockchain, or advanced technologies. A comprehensive OA is strongly recommended to properly assess actual capabilities.',
+      recommendations: [
+        'Require comprehensive technical OA - GitHub does not demonstrate claimed skills',
+        'Focus on fundamental programming concepts and problem-solving',
+        'Assess basic data structures and algorithms knowledge',
+        'Consider entry-level positions instead of senior roles'
+      ]
+    },
+
+    // Blog Analysis Data
+    blogData: {
+      overallScore: 12,
+      thoughtLeadershipScore: 8,
+      technicalWritingScore: 15,
+      consistencyScore: 5,
+      totalPosts: 0,
+      totalViews: 0,
+      totalEngagement: 0,
+      platforms: [],
+      topTopics: [],
+      posts: [],
+      writingAnalysis: {
+        averageReadTime: 0,
+        averageQuality: 0,
+        averageRelevance: 0,
+        writingStyle: 'No Content Found',
+        technicalDepth: 'No Evidence'
+      },
+      careerImpact: {
+        thoughtLeadership: 0,
+        industryRecognition: 0,
+        knowledgeSharing: 0,
+        communityEngagement: 0
+      }
+    },
+
+    // Stack Overflow Data
+    stackOverflowData: {
+      profile: {
+        reputation: 1,
+        badgeCount: 0,
+        goldBadges: 0,
+        silverBadges: 0,
+        bronzeBadges: 0,
+        questionsAsked: 0,
+        answersProvided: 0,
+        memberSince: 'Not Found',
+        lastActive: 'Never'
+      },
+      expertise: {
+        topTags: [],
+        knowledgeAreas: [],
+        expertiseLevel: 0,
+        consistencyScore: 0
+      },
+      engagement: {
+        helpfulnessScore: 0,
+        communityContribution: 0,
+        mentorshipIndicator: 0,
+        problemSolvingScore: 0
+      },
+      recentActivity: [],
+      careerRelevance: {
+        jobRelevantTags: [],
+        domainExpertise: 0,
+        technicalDepth: 0,
+        practicalExperience: 0
+      }
+    }
+  }
+}
+
 const generateEnhancedAnalysisData = (candidateId?: string) => {
-  // Return red flag data for John Thompson
-  if (candidateId === 'john-fake') {
-    return generateJohnFakeAnalysisData()
+  // Return basic demo data for Alex Johnson
+  if (candidateId === 'basic-demo') {
+    return generateBasicDemoAnalysisData()
+  }
+  
+  // Return red flag data for Alex Smith
+  if (candidateId === 'red-flag-demo') {
+    return generateRedFlagAnalysisData()
   }
   
   return {
@@ -508,7 +878,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
     // GitHub Analysis Data
     githubData: {
       profile: {
-        name: 'Abdullah Sahapde',
+        name: 'Marcus Chen',
         bio: 'Full-stack developer passionate about AI/ML and scalable systems',
         company: 'TechFlow Solutions',
         location: 'San Francisco, CA',
@@ -532,7 +902,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
           codeQuality: 94,
           resumeClaim: 'Led development of AI-powered recruitment platform serving 10,000+ users',
           verification: 'verified' as const,
-          url: 'https://github.com/asahapde/screenai'
+          url: 'https://github.com/marcuschen/screenai'
         },
         {
           name: 'microservices-ecommerce',
@@ -546,7 +916,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
           codeQuality: 91,
           resumeClaim: 'Built scalable microservices architecture',
           verification: 'verified' as const,
-          url: 'https://github.com/asahapde/microservices-ecommerce'
+          url: 'https://github.com/marcuschen/microservices-ecommerce'
         }
       ],
       commits: [
@@ -556,7 +926,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
           additions: 245,
           deletions: 32,
           sha: 'abc123',
-          url: 'https://github.com/asahapde/screenai/commit/abc123'
+          url: 'https://github.com/marcuschen/screenai/commit/abc123'
         },
         {
           date: '2024-01-19',
@@ -564,7 +934,7 @@ const generateEnhancedAnalysisData = (candidateId?: string) => {
           additions: 67,
           deletions: 89,
           sha: 'def456',
-          url: 'https://github.com/asahapde/screenai/commit/def456'
+          url: 'https://github.com/marcuschen/screenai/commit/def456'
         }
       ],
       languageStats: {
